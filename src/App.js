@@ -14,17 +14,14 @@ function App() {
   const colorScheme = ['#ffffff', '#FBF3D5', '#D6DAC8', '#FF33A1', '#33FFF9'];
   const circleRadius = 15; // Fixed radius for static circles
 
-  // Backend modification of level 0 node text for 'Country' or Alternative view
   const level0Text = "🌍"; // Modify this variable in the backend to change level 0 node text
-
-  // Customizable text for the hyperlink in the tooltip
   const linkText = "🌐 Website";  // Modify this variable to change the tooltip hyperlink text
 
   useEffect(() => {
     const fetchData = async () => {
       const sheetId = '1Ci4Hay8-cHgqq9L8LZV6WIH5rgn8BVJa6018xEmdKTo';
       const apiKey = 'AIzaSyCvCL5fqdrjGj_WjMt_fVDpPLWYSSLRjs8';
-      const range = 'Sheet1!A1:H10';
+      const range = 'Sheet1!A1:H500';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
       try {
@@ -96,12 +93,11 @@ function App() {
 
   const graphData = { nodes: nodes, links: links };
 
-  // Helper function to wrap text for circular nodes
   const wrapText = (ctx, text, maxWidth) => {
     const words = text.split(' ');
     let line = '';
     const lines = [];
-    
+
     words.forEach(word => {
       const testLine = line + word;
       const metrics = ctx.measureText(testLine);
@@ -117,7 +113,6 @@ function App() {
     return lines;
   };
 
-  // Custom node rendering with circular nodes for depth 0 and 1, rectangular for deeper nodes
   const paintNode = (node, ctx, globalScale) => {
     let fontSize = Math.max(2.5, 3 / globalScale);
 
@@ -150,7 +145,7 @@ function App() {
       const maxWidth = 10; // Set maximum width for text wrapping
       const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth); // Convert text to small caps
       const textHeight = textLines.length * fontSize + 1;
-      
+
       textLines.forEach((line, index) => {
         const lineX = node.x;
         const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize;
@@ -188,61 +183,73 @@ function App() {
   };
 
   return (
-    <div align="center" onClick={() => setClickedNode(null)} style={{ fontFamily: 'Courier New' }}>
-      <h1>MycelialNet🌏</h1>
-      <label>
-        <input type="radio" name="viewMode" value="Industry" checked={viewMode === 'Industry'} onChange={() => setViewMode('Industry')} />
-        Industry
-      </label>
-      <label style={{ marginLeft: '10px' }}>
-        <input type="radio" name="viewMode" value="Country" checked={viewMode === 'Country'} onChange={() => setViewMode('Country')} />
-        Country
-      </label>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {/* Main content */}
+      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' , backgroundcolor:'#d3d3d3'}} onClick={() => setClickedNode(null)}>
+        <h1>MycelialNet🌏</h1>
+        
+        <div style={{alignItems:'center', textAlign:'center'}}>
+          <label>
+            <input type="radio" name="viewMode" value="Industry" checked={viewMode === 'Industry'} onChange={() => setViewMode('Industry')} />
+            Industry
+          </label>
+          <label style={{ marginLeft: '10px' }}>
+            <input type="radio" name="viewMode" value="Country" checked={viewMode === 'Country'} onChange={() => setViewMode('Country')} />
+            Country
+          </label>
+        </div>
+        <div style={{ alignItems: 'left', fontSize: '10px'}}><p>Created by</p>
+  <a href="http://blunkworks.com/about" target="_blank" rel="noopener noreferrer"> 
+    <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '75px' }} />
+  </a>
+</div>
+        {loading ? (
+          <p>Loading data...</p>
+        ) : (
+          <>
+            <ForceGraph2D
+              graphData={graphData}
+              nodeCanvasObject={paintNode}
+              linkCurvature={0.2}
+              nodeAutoColorBy="depth"
+              d3Force={forceSimulation => {
+                forceSimulation.force('collision', d3.forceCollide(circleRadius * 1.2 + 12));
+                forceSimulation.force('y', d3.forceY(0).strength(0.1));
+              }}
+              onNodeClick={handleNodeClick}
+            />
+            {clickedNode && (
+              <div style={{
+                position: 'absolute',
+                top: `${tooltipPos.y}px`,
+                left: `${tooltipPos.x}px`,
+                padding: '10px',
+                color: 'white',
+                backgroundColor: '#505050',
+                pointerEvents: 'auto',
+                zIndex: 1000,
+                width: '20vw',
+                fontSize: '80%',
+                whiteSpace: 'normal'
+              }}>
+                {clickedNode.tooltip}
+                {clickedNode.url && (
+                  <a
+                    href={clickedNode.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: 'lightblue', marginLeft: '10px', pointerEvents: 'auto' }}
+                  >
+                    {linkText} {/* Use customizable link text */}
+                  </a>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
-      {loading ? (
-        <p>Loading data...</p>
-      ) : (
-        <>
-          <ForceGraph2D
-            graphData={graphData}
-            nodeCanvasObject={paintNode}
-            linkCurvature={0.2}
-            nodeAutoColorBy="depth"
-            d3Force={forceSimulation => {
-              forceSimulation.force('collision', d3.forceCollide(circleRadius * 1.2 + 12));
-              forceSimulation.force('y', d3.forceY(0).strength(0.1));
-            }}
-            onNodeClick={handleNodeClick}
-          />
-          {clickedNode && (
-            <div style={{
-              position: 'absolute',
-              top: `${tooltipPos.y}px`,
-              left: `${tooltipPos.x}px`,
-              padding: '10px',
-              color: 'white',
-              backgroundColor: '#505050',
-              pointerEvents: 'auto',
-              zIndex: 1000,
-              width: '20vw',
-              fontSize: '80%',
-              whiteSpace: 'normal'
-            }}>
-              {clickedNode.tooltip}
-              {clickedNode.url && (
-                <a
-                  href={clickedNode.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: 'lightblue', marginLeft: '10px', pointerEvents: 'auto' }}
-                >
-                  {linkText} {/* Use customizable link text */}
-                </a>
-              )}
-            </div>
-          )}
-        </>
-      )}
+    
     </div>
   );
 }
