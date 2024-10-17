@@ -137,7 +137,7 @@ function App() {
 
       if (clickedNode && clickedNode.id === node.id) {
         ctx.lineWidth = 1;
-        ctx.strokeStyle = 'yellow';
+        ctx.strokeStyle = 'black';
         ctx.stroke();
       }
 
@@ -182,13 +182,18 @@ function App() {
     event.stopPropagation();
   };
 
+
   return (
+    
+
+
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       {/* Main content */}
+
       <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' , backgroundcolor:'#d3d3d3'}} onClick={() => setClickedNode(null)}>
         <h1>MycelialNet🌏</h1>
-        
-        <div style={{alignItems:'center', textAlign:'center'}}>
+          
+        <div style={{alignItems:'center', textAlign:'center', marginBottom:'20px'}}>
           <label>
             <input type="radio" name="viewMode" value="Industry" checked={viewMode === 'Industry'} onChange={() => setViewMode('Industry')} />
             Industry
@@ -198,11 +203,12 @@ function App() {
             Country
           </label>
         </div>
-        <div style={{ alignItems: 'left', fontSize: '10px'}}><p>Created by</p>
-  <a href="http://blunkworks.com/about" target="_blank" rel="noopener noreferrer"> 
-    <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '75px' }} />
-  </a>
-</div>
+         <div style={{ display: 'flex', alignItems: 'center'}}>
+            <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
+              <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
+                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '70px' }} /></a>
+          </div>  
+        
         {loading ? (
           <p>Loading data...</p>
         ) : (
@@ -247,8 +253,9 @@ function App() {
             )}
           </>
         )}
+          
       </div>
-
+        
     
     </div>
   );
