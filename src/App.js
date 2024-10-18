@@ -37,7 +37,6 @@ function App() {
             if (index === 0) return; // Skip header row
             const [node, parent, description, url, , , , tooltip, , , , displayName] = row; // Use column L as displayName
 
-            // Use displayName (Column L) as the node name, fall back to Column A if L is empty
             const nodeName = displayName || node;
 
             nodeData.push({ id: nodeName, description: description || '', tooltip: tooltip || '', url: url || '' });
@@ -64,7 +63,6 @@ function App() {
           });
 
         } else if (viewMode === 'Country') {
-          
           const countryNodes = {};
           const categoryNodes = {};
 
@@ -95,7 +93,7 @@ function App() {
               nodeData.push({
                 id: node,
                 description: description || '',
-                tooltip: tooltip || '',
+                tooltip: tooltip || '', // Tooltip data from column H
                 url: url || '',
                 color: colorScheme[3],
                 depth: 3
@@ -219,8 +217,8 @@ function App() {
       ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
 
       if (clickedNode && clickedNode.id === node.id) {
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = '#cfff66';
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#83ff66';
         ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
       }
 
@@ -238,7 +236,7 @@ function App() {
     setClickedNode(node);
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    setTooltipPos({ x: mouseX, y: mouseY + 5 });
+    setTooltipPos({ x: mouseX - 3, y: mouseY -1 });
     event.stopPropagation();
   };
 
@@ -273,7 +271,7 @@ function App() {
               <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
                 <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
          </div>  
-         <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>⚠️ In Construction! // If things look weird, pull the nodes around and it should clean itself up. :)</p>
+         <p style={{ fontSize: '8px', margin: '0 0 20px 0' }}>⚠️ In Construction! // If things look weird, pull the nodes into open space and it should clean itself up. :)</p>
         
         {loading ? (
           <p>Loading data...</p>
@@ -291,7 +289,7 @@ function App() {
                 forceSimulation.force('collision', d3.forceCollide(d => (d.depth === 3 ? 60 : 80)));
 
                 // Repelling force to push nodes apart
-                forceSimulation.force('charge', d3.forceManyBody().strength(-400));
+                forceSimulation.force('charge', d3.forceManyBody().strength(-200));
 
                 // Centering force to keep nodes within the view
                 forceSimulation.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
