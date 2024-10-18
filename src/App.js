@@ -6,22 +6,22 @@ import * as d3 from 'd3-force'; // Import d3-force for collision and other force
 function App() {
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
-  const [loading, setLoading] = useState(true);  // Add loading state
-  const [clickedNode, setClickedNode] = useState(null);  // Track the clicked node
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });  // Track tooltip position
-  const [viewMode, setViewMode] = useState('Industry'); // Toggle between 'Industry' and 'Country'
+  const [loading, setLoading] = useState(true);
+  const [clickedNode, setClickedNode] = useState(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [viewMode, setViewMode] = useState('Industry');
 
-  const colorScheme = ['#ffffff', '#FBF3D5', '#D6DAC8', '#FF33A1', '#33FFF9'];
-  const circleRadius = 15; // Fixed radius for static circles
+  const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#33FFF9'];
+  const circleRadius = 20; // Fixed radius for static circles
 
   const level0Text = "🌍"; // Modify this variable in the backend to change level 0 node text
-  const linkText = "🌐 Website";  // Modify this variable to change the tooltip hyperlink text
+  const linkText = "🌐 Website";
 
   useEffect(() => {
     const fetchData = async () => {
       const sheetId = '1Ci4Hay8-cHgqq9L8LZV6WIH5rgn8BVJa6018xEmdKTo';
       const apiKey = 'AIzaSyCvCL5fqdrjGj_WjMt_fVDpPLWYSSLRjs8';
-      const range = 'Sheet1!A1:H500';
+      const range = 'Main!A1:L500';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
       try {
@@ -34,12 +34,16 @@ function App() {
         if (viewMode === 'Industry') {
           const parentMap = {};
           rows.forEach((row, index) => {
-            if (index === 0) return;
-            const [node, parent, description, url, , , , tooltip] = row;
-            nodeData.push({ id: node, description: description || '', tooltip: tooltip || '', url: url || '' });
+            if (index === 0) return; // Skip header row
+            const [node, parent, description, url, , , , tooltip, , , , displayName] = row; // Use column L as displayName
+
+            // Use displayName (Column L) as the node name, fall back to Column A if L is empty
+            const nodeName = displayName || node;
+
+            nodeData.push({ id: nodeName, description: description || '', tooltip: tooltip || '', url: url || '' });
             if (parent) {
-              parentMap[node] = parent;
-              linkData.push({ source: parent, target: node });
+              parentMap[nodeName] = parent;
+              linkData.push({ source: parent, target: nodeName });
             }
           });
 
@@ -60,24 +64,51 @@ function App() {
           });
 
         } else if (viewMode === 'Country') {
-          const countries = new Set();
+          
           const countryNodes = {};
+          const categoryNodes = {};
+
           rows.forEach((row, index) => {
             if (index === 0) return;
-            const [node, , description, url, country, , , tooltip] = row;
+            const [node, category, description, url, country, , , tooltip] = row;
+
+            const countryCategoryKey = `${country}-${category}`;
+
             if (country) {
-              countries.add(country);
               if (!countryNodes[country]) {
                 countryNodes[country] = { id: country, depth: 1, color: colorScheme[1] };
                 nodeData.push(countryNodes[country]);
                 linkData.push({ source: level0Text, target: country });
               }
-              nodeData.push({ id: node, description: description || '', tooltip: tooltip || '', url: url || '', color: colorScheme[2], depth: 2 });
-              linkData.push({ source: country, target: node });
+
+              if (!categoryNodes[countryCategoryKey]) {
+                categoryNodes[countryCategoryKey] = { 
+                  id: countryCategoryKey, 
+                  name: category, 
+                  depth: 2, 
+                  color: colorScheme[2] 
+                };
+                nodeData.push(categoryNodes[countryCategoryKey]);
+                linkData.push({ source: country, target: countryCategoryKey });
+              }
+
+              nodeData.push({
+                id: node,
+                description: description || '',
+                tooltip: tooltip || '',
+                url: url || '',
+                color: colorScheme[3],
+                depth: 3
+              });
+              linkData.push({ source: countryCategoryKey, target: node });
             }
           });
+
           nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
         }
+
+        // Apply concentric layout (onion-like) to enforce hierarchy
+        applyConcentricLayout(nodeData, 300);
 
         setNodes(nodeData);
         setLinks(linkData);
@@ -89,7 +120,32 @@ function App() {
     };
 
     fetchData();
+
   }, [viewMode, level0Text]);
+
+  // Concentric layout to visually emphasize hierarchy and prevent crossing
+  const applyConcentricLayout = (nodeData, radiusStep) => {
+    const layers = {};
+
+    nodeData.forEach(node => {
+      if (!layers[node.depth]) {
+        layers[node.depth] = [];
+      }
+      layers[node.depth].push(node);
+    });
+
+    // Place nodes in concentric circles based on their depth
+    Object.keys(layers).forEach(depth => {
+      const layer = layers[depth];
+      const angleStep = (40 * Math.PI) / layer.length + 10;
+      layer.forEach((node, i) => {
+        const angle = i * angleStep;
+        const radius = radiusStep * depth;
+        node.x = radius * Math.cos(angle);
+        node.y = radius * Math.sin(angle);
+      });
+    });
+  };
 
   const graphData = { nodes: nodes, links: links };
 
@@ -120,10 +176,13 @@ function App() {
       fontSize *= 10;
       ctx.font = `bold ${fontSize}px "Courier New"`;
     } else if (node.depth === 1) {
-      fontSize *= 1.2;
-      ctx.font = `${fontSize}px "Courier New"`;
+      fontSize *= 1.4;
+      ctx.font = `bold ${fontSize}px "Courier New" `;
+    } else if (node.depth === 2) {
+      fontSize *= 1.5;
+      ctx.font = `bold ${fontSize}px "Courier New" `;
     } else {
-      ctx.font = `${fontSize}px "Courier New"`;
+      ctx.font = `bold ${fontSize}px "Courier New"`;
     }
 
     ctx.textAlign = 'center';
@@ -142,8 +201,8 @@ function App() {
       }
 
       ctx.fillStyle = 'black';
-      const maxWidth = 10; // Set maximum width for text wrapping
-      const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth); // Convert text to small caps
+      const maxWidth = 10;
+      const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
       const textHeight = textLines.length * fontSize + 1;
 
       textLines.forEach((line, index) => {
@@ -153,8 +212,9 @@ function App() {
       });
 
     } else {
-      const textWidth = ctx.measureText(node.id).width;
-      const bckgDimensions = [textWidth + 12, fontSize + 8];
+      const text = node.name || node.id;
+      const textWidth = ctx.measureText(text).width;
+      const bckgDimensions = [textWidth, fontSize];
       ctx.fillStyle = node.color || 'orange';
       ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
 
@@ -165,7 +225,7 @@ function App() {
       }
 
       ctx.fillStyle = 'black';
-      ctx.fillText(node.id, node.x, node.y);
+      ctx.fillText(text, node.x, node.y);
     }
   };
 
@@ -178,20 +238,14 @@ function App() {
     setClickedNode(node);
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    setTooltipPos({ x: mouseX + 20, y: mouseY - 20 });
+    setTooltipPos({ x: mouseX + 25, y: mouseY + 10 });
     event.stopPropagation();
   };
 
-
   return (
-    
-
-
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Main content */}
-
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' , backgroundcolor:'#d3d3d3'}} onClick={() => setClickedNode(null)}>
-        <h1>MycelialNet🌏</h1>
+      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={() => setClickedNode(null)}>
+        <h1>MycelialNet🌍</h1>
           
         <div style={{alignItems:'center', textAlign:'center', marginBottom:'20px'}}>
           <label>
@@ -203,11 +257,23 @@ function App() {
             Country
           </label>
         </div>
-         <div style={{ display: 'flex', alignItems: 'center'}}>
+        <i style={{ fontSize: '12px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+            + Add a Company Here!
+          </a>
+        </i>
+         <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+          <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
+            ✉️ Contact
+          </a>
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center'}}>
             <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
               <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
-                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '70px' }} /></a>
-          </div>  
+                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
+         </div>  
+         <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>⚠️ In Construction! // If things look weird, pull the nodes around and it should clean itself up. :)</p>
         
         {loading ? (
           <p>Loading data...</p>
@@ -216,11 +282,19 @@ function App() {
             <ForceGraph2D
               graphData={graphData}
               nodeCanvasObject={paintNode}
-              linkCurvature={0.2}
+              linkCurvature={0.0}
               nodeAutoColorBy="depth"
               d3Force={forceSimulation => {
-                forceSimulation.force('collision', d3.forceCollide(circleRadius * 1.2 + 12));
-                forceSimulation.force('y', d3.forceY(0).strength(0.1));
+                forceSimulation.force('link', d3.forceLink().id(d => d.id).distance(150));
+
+                // Collision force to prevent node overlap
+                forceSimulation.force('collision', d3.forceCollide(d => (d.depth === 3 ? 60 : 80)));
+
+                // Repelling force to push nodes apart
+                forceSimulation.force('charge', d3.forceManyBody().strength(-400));
+
+                // Centering force to keep nodes within the view
+                forceSimulation.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
               }}
               onNodeClick={handleNodeClick}
             />
@@ -246,17 +320,14 @@ function App() {
                     rel="noopener noreferrer"
                     style={{ color: 'lightblue', marginLeft: '10px', pointerEvents: 'auto' }}
                   >
-                    {linkText} {/* Use customizable link text */}
+                    {linkText}
                   </a>
                 )}
               </div>
             )}
           </>
         )}
-          
       </div>
-        
-    
     </div>
   );
 }
