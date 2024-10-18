@@ -219,8 +219,8 @@ function App() {
       ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
 
       if (clickedNode && clickedNode.id === node.id) {
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'yellow';
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#cfff66';
         ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
       }
 
@@ -238,7 +238,7 @@ function App() {
     setClickedNode(node);
     const mouseX = event.clientX;
     const mouseY = event.clientY;
-    setTooltipPos({ x: mouseX + 25, y: mouseY + 10 });
+    setTooltipPos({ x: mouseX, y: mouseY + 5 });
     event.stopPropagation();
   };
 
@@ -308,8 +308,8 @@ function App() {
                 backgroundColor: '#505050',
                 pointerEvents: 'auto',
                 zIndex: 1000,
-                width: '20vw',
-                fontSize: '80%',
+                width: '15vw',
+                fontSize: '60%',
                 whiteSpace: 'normal'
               }}>
                 {clickedNode.tooltip}
