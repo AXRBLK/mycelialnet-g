@@ -12,7 +12,7 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
 
   const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#33FFF9'];
-  const circleRadius = 20; // Fixed radius for static circles
+  const circleRadius = 10; // Fixed radius for static circles
 
   const level0Text = "🌍"; // Modify this variable in the backend to change level 0 node text
   const linkText = "🌐 Website";
@@ -135,7 +135,7 @@ function App() {
     // Place nodes in concentric circles based on their depth
     Object.keys(layers).forEach(depth => {
       const layer = layers[depth];
-      const angleStep = (40 * Math.PI) / layer.length + 10;
+      const angleStep = ( 20*Math.PI) / layer.length ;
       layer.forEach((node, i) => {
         const angle = i * angleStep;
         const radius = radiusStep * depth;
@@ -171,10 +171,10 @@ function App() {
     let fontSize = Math.max(2.5, 3 / globalScale);
 
     if (node.depth === 0) {
-      fontSize *= 10;
+      fontSize *= 15;
       ctx.font = `bold ${fontSize}px "Courier New"`;
     } else if (node.depth === 1) {
-      fontSize *= 1.4;
+      fontSize *= 1;
       ctx.font = `bold ${fontSize}px "Courier New" `;
     } else if (node.depth === 2) {
       fontSize *= 1.5;
@@ -289,7 +289,7 @@ function App() {
                 forceSimulation.force('collision', d3.forceCollide(d => (d.depth === 3 ? 60 : 80)));
 
                 // Repelling force to push nodes apart
-                forceSimulation.force('charge', d3.forceManyBody().strength(-200));
+                forceSimulation.force('charge', d3.forceManyBody().strength(-100));
 
                 // Centering force to keep nodes within the view
                 forceSimulation.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
