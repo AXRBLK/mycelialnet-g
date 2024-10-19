@@ -350,6 +350,7 @@ function App() {
                 }}
               >
                 {clickedNode.tooltip}
+                 <br />
                 {clickedNode.url && (
                   <a
                     href={clickedNode.url}
