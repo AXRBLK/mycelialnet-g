@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import axios from 'axios';
-import * as d3 from 'd3-force'; // Import d3-force for collision and other forces
+import { forceLink, forceCollide, forceManyBody, forceCenter } from 'd3-force';
 
 function App() {
   const [nodes, setNodes] = useState([]);
@@ -12,10 +12,30 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
 
   const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#33FFF9'];
-  const circleRadius = 10; // Fixed radius for static circles
+  const circleRadius = 10;
 
-  const level0Text = "🌍"; // Modify this variable in the backend to change level 0 node text
+  const level0Text = "🌍";
   const linkText = "🌐 Website";
+
+  const wrapText = (ctx, text, maxWidth) => {
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+
+    words.forEach(word => {
+      const testLine = line + word + ' ';
+      const metrics = ctx.measureText(testLine);
+      const testWidth = metrics.width;
+      if (testWidth > maxWidth && line !== '') {
+        lines.push(line);
+        line = word + ' ';
+      } else {
+        line = testLine;
+      }
+    });
+    lines.push(line.trim());
+    return lines;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,11 +55,11 @@ function App() {
           const parentMap = {};
           rows.forEach((row, index) => {
             if (index === 0) return; // Skip header row
-            const [node, parent, description, url, , , , tooltip, , , , displayName] = row; // Use column L as displayName
-
+            const [node, parent, description, url, , , , tooltip, , , , displayName] = row;
             const nodeName = displayName || node;
 
             nodeData.push({ id: nodeName, description: description || '', tooltip: tooltip || '', url: url || '' });
+
             if (parent) {
               parentMap[nodeName] = parent;
               linkData.push({ source: parent, target: nodeName });
@@ -61,13 +81,12 @@ function App() {
             node.depth = depth;
             node.color = colorScheme[depth];
           });
-
         } else if (viewMode === 'Country') {
           const countryNodes = {};
           const categoryNodes = {};
 
           rows.forEach((row, index) => {
-            if (index === 0) return;
+            if (index === 0) return; // Skip header row
             const [node, category, description, url, country, , , tooltip] = row;
 
             const countryCategoryKey = `${country}-${category}`;
@@ -80,11 +99,12 @@ function App() {
               }
 
               if (!categoryNodes[countryCategoryKey]) {
-                categoryNodes[countryCategoryKey] = { 
-                  id: countryCategoryKey, 
-                  name: category, 
-                  depth: 2, 
-                  color: colorScheme[2] 
+                categoryNodes[countryCategoryKey] = {
+                  id: countryCategoryKey,
+                  name: category,
+                  depth: 2,
+                  color: colorScheme[2],
+                  tooltip: tooltip || `Category: ${category}`,
                 };
                 nodeData.push(categoryNodes[countryCategoryKey]);
                 linkData.push({ source: country, target: countryCategoryKey });
@@ -93,7 +113,7 @@ function App() {
               nodeData.push({
                 id: node,
                 description: description || '',
-                tooltip: tooltip || '', // Tooltip data from column H
+                tooltip: tooltip || '',
                 url: url || '',
                 color: colorScheme[3],
                 depth: 3
@@ -105,7 +125,6 @@ function App() {
           nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
         }
 
-        // Apply concentric layout (onion-like) to enforce hierarchy
         applyConcentricLayout(nodeData, 300);
 
         setNodes(nodeData);
@@ -118,10 +137,8 @@ function App() {
     };
 
     fetchData();
-
   }, [viewMode, level0Text]);
 
-  // Concentric layout to visually emphasize hierarchy and prevent crossing
   const applyConcentricLayout = (nodeData, radiusStep) => {
     const layers = {};
 
@@ -132,10 +149,9 @@ function App() {
       layers[node.depth].push(node);
     });
 
-    // Place nodes in concentric circles based on their depth
     Object.keys(layers).forEach(depth => {
       const layer = layers[depth];
-      const angleStep = ( 20*Math.PI) / layer.length ;
+      const angleStep = (20 * Math.PI) / layer.length;
       layer.forEach((node, i) => {
         const angle = i * angleStep;
         const radius = radiusStep * depth;
@@ -145,33 +161,14 @@ function App() {
     });
   };
 
-  const graphData = { nodes: nodes, links: links };
-
-  const wrapText = (ctx, text, maxWidth) => {
-    const words = text.split(' ');
-    let line = '';
-    const lines = [];
-
-    words.forEach(word => {
-      const testLine = line + word;
-      const metrics = ctx.measureText(testLine);
-      const testWidth = metrics.width;
-      if (testWidth > maxWidth && line !== '') {
-        lines.push(line);
-        line = word + ' ';
-      } else {
-        line = testLine;
-      }
-    });
-    lines.push(line);
-    return lines;
-  };
+  const graphData = { nodes, links };
 
   const paintNode = (node, ctx, globalScale) => {
     let fontSize = Math.max(2.5, 3 / globalScale);
+    let bckgDimensions = null;
 
     if (node.depth === 0) {
-      fontSize *= 15;
+      fontSize *= 20;
       ctx.font = `bold ${fontSize}px "Courier New"`;
     } else if (node.depth === 1) {
       fontSize *= 1;
@@ -212,7 +209,7 @@ function App() {
     } else {
       const text = node.name || node.id;
       const textWidth = ctx.measureText(text).width;
-      const bckgDimensions = [textWidth, fontSize];
+      bckgDimensions = [textWidth, fontSize];
       ctx.fillStyle = node.color || 'orange';
       ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
 
@@ -225,37 +222,76 @@ function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, node.x, node.y);
     }
+
+    node.bckgDimensions = bckgDimensions || [circleRadius * 3, circleRadius * 3];
   };
 
   const handleNodeClick = (node, event) => {
-    if (!node.tooltip || node.tooltip.trim() === '') {
+    const mouseX = event.clientX;
+    const mouseY = event.clientY;
+
+    // Prevent tooltip for level 2 nodes in 'Country' view mode
+    if (viewMode === 'Country' && node.depth === 2) {
       setClickedNode(null);
       return;
     }
 
-    setClickedNode(node);
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-    setTooltipPos({ x: mouseX - 3, y: mouseY -1 });
+    // Only show tooltip if the node has a non-empty tooltip
+    if (node.tooltip && node.tooltip.trim() !== '') {
+      setClickedNode(node);
+      setTooltipPos({ x: mouseX - 3, y: mouseY - 1 });
+    } else {
+      setClickedNode(null);
+    }
     event.stopPropagation();
+  };
+
+  const handleNodeHover = (node) => {
+    const graphContainer = document.querySelector("canvas");
+
+    // Disable hover effect for level 2 nodes in 'Country' view mode
+    if (viewMode === 'Country' && node?.depth === 2) {
+      graphContainer.style.cursor = "default";
+      return;
+    }
+
+    if (node && node.tooltip && node.tooltip.trim() !== "") {
+      graphContainer.style.cursor = "zoom-in"; // Show magnifying glass if tooltip exists
+    } else {
+      graphContainer.style.cursor = "default";
+    }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <div style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }} onClick={() => setClickedNode(null)}>
+      <div
+        style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        onClick={() => setClickedNode(null)}
+      >
         <h1>MycelialNet🌍</h1>
-          
-        <div style={{alignItems:'center', textAlign:'center', marginBottom:'20px'}}>
+        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
           <label>
-            <input type="radio" name="viewMode" value="Industry" checked={viewMode === 'Industry'} onChange={() => setViewMode('Industry')} />
+            <input
+              type="radio"
+              name="viewMode"
+              value="Industry"
+              checked={viewMode === 'Industry'}
+              onChange={() => setViewMode('Industry')}
+            />
             Industry
           </label>
           <label style={{ marginLeft: '10px' }}>
-            <input type="radio" name="viewMode" value="Country" checked={viewMode === 'Country'} onChange={() => setViewMode('Country')} />
+            <input
+              type="radio"
+              name="viewMode"
+              value="Country"
+              checked={viewMode === 'Country'}
+              onChange={() => setViewMode('Country')}
+            />
             Country
           </label>
         </div>
-        <i style={{ fontSize: '12px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+            <i style={{ fontSize: '12px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
           <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
             + Add a Company Here!
           </a>
@@ -271,8 +307,11 @@ function App() {
               <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
                 <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
          </div>  
-         <p style={{ fontSize: '8px', margin: '0 0 20px 0' }}>⚠️ In Construction! // If things look weird, pull the nodes into open space and it should clean itself up. :)</p>
-        
+          <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
+            <b>⚠️ In Construction!</b> <br /> 
+            If things look off, pull the nodes into open space and<br />  maybe it will correct itself! :)
+          </p>
+
         {loading ? (
           <p>Loading data...</p>
         ) : (
@@ -282,34 +321,34 @@ function App() {
               nodeCanvasObject={paintNode}
               linkCurvature={0.0}
               nodeAutoColorBy="depth"
-              d3Force={forceSimulation => {
-                forceSimulation.force('link', d3.forceLink().id(d => d.id).distance(150));
+              d3Force={(forceSimulation) => {
+                forceSimulation.force('link', forceLink().id((d) => d.id).distance(400));
 
-                // Collision force to prevent node overlap
-                forceSimulation.force('collision', d3.forceCollide(d => (d.depth === 3 ? 60 : 80)));
-
-                // Repelling force to push nodes apart
-                forceSimulation.force('charge', d3.forceManyBody().strength(-100));
+                // No collision force to prevent nodes moving around due to tooltips
+                forceSimulation.force('charge', forceManyBody().strength(0));
 
                 // Centering force to keep nodes within the view
-                forceSimulation.force('center', d3.forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+                forceSimulation.force('center', forceCenter(window.innerWidth / 2, window.innerHeight / 2));
               }}
               onNodeClick={handleNodeClick}
+              onNodeHover={handleNodeHover} // Set hover effect
             />
             {clickedNode && (
-              <div style={{
-                position: 'absolute',
-                top: `${tooltipPos.y}px`,
-                left: `${tooltipPos.x}px`,
-                padding: '10px',
-                color: 'white',
-                backgroundColor: '#505050',
-                pointerEvents: 'auto',
-                zIndex: 1000,
-                width: '15vw',
-                fontSize: '60%',
-                whiteSpace: 'normal'
-              }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: `${tooltipPos.y}px`,
+                  left: `${tooltipPos.x}px`,
+                  padding: '10px',
+                  color: 'white',
+                  backgroundColor: '#505050',
+                  pointerEvents: 'auto',
+                  zIndex: 1000,
+                  width: `15%`,
+                  fontSize: '60%',
+                  whiteSpace: 'normal',
+                }}
+              >
                 {clickedNode.tooltip}
                 {clickedNode.url && (
                   <a
