@@ -220,7 +220,7 @@ function App() {
 
       if (clickedNode && clickedNode.id === node.id) {
         ctx.lineWidth = 4;
-        ctx.strokeStyle = '#83ff66';
+        //ctx.strokeStyle = '#83ff66';
         ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
       }
 
@@ -244,7 +244,7 @@ function App() {
     // Only show tooltip if the node has a non-empty tooltip
     if (node.tooltip && node.tooltip.trim() !== '') {
       setClickedNode(node);
-      setTooltipPos({ x: mouseX - 3, y: mouseY - 1 });
+      setTooltipPos({ x: mouseX -10, y: mouseY -10 });
 
       // Pause the simulation when a tooltip is shown
       if (fgRef.current) {
@@ -314,9 +314,9 @@ function App() {
             Country
           </label>
         </div>
-            <i style={{ fontSize: '12px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+            <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
           <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-            + Add a Company Here!
+            + Add Company
           </a>
         </i>
          <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
