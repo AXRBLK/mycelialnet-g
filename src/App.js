@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import axios from 'axios';
 import { forceLink, forceCollide, forceManyBody, forceCenter } from 'd3-force';
@@ -10,6 +10,7 @@ function App() {
   const [clickedNode, setClickedNode] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [viewMode, setViewMode] = useState('Industry');
+  const fgRef = useRef();
 
   const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#33FFF9'];
   const circleRadius = 10;
@@ -183,6 +184,12 @@ function App() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
+    // Highlight the clicked node after the tooltip is displayed
+    if (clickedNode && clickedNode.id === node.id) {
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = 'black';
+    }
+
     if (node.depth <= 1) {
       ctx.beginPath();
       ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
@@ -190,8 +197,6 @@ function App() {
       ctx.fill();
 
       if (clickedNode && clickedNode.id === node.id) {
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = 'black';
         ctx.stroke();
       }
 
@@ -227,8 +232,8 @@ function App() {
   };
 
   const handleNodeClick = (node, event) => {
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
+    const mouseX = event.clientX || event.touches?.[0]?.clientX || 0;
+    const mouseY = event.clientY || event.touches?.[0]?.clientY || 0;
 
     // Prevent tooltip for level 2 nodes in 'Country' view mode
     if (viewMode === 'Country' && node.depth === 2) {
@@ -240,8 +245,18 @@ function App() {
     if (node.tooltip && node.tooltip.trim() !== '') {
       setClickedNode(node);
       setTooltipPos({ x: mouseX - 3, y: mouseY - 1 });
+
+      // Pause the simulation when a tooltip is shown
+      if (fgRef.current) {
+        fgRef.current.pauseAnimation();
+      }
     } else {
       setClickedNode(null);
+
+      // Resume the simulation when the tooltip is closed
+      if (fgRef.current) {
+        fgRef.current.resumeAnimation();
+      }
     }
     event.stopPropagation();
   };
@@ -266,7 +281,15 @@ function App() {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div
         style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        onClick={() => setClickedNode(null)}
+        onClick={() => {
+          setClickedNode(null);
+
+          // Resume the simulation when the tooltip is closed
+          if (fgRef.current) {
+            fgRef.current.resumeAnimation();
+          }
+        }}
+        onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
       >
         <h1>MycelialNet🌍</h1>
         <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
@@ -308,8 +331,8 @@ function App() {
                 <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
          </div>  
           <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
-            <b>⚠️ In Construction!</b> <br /> 
-            If things look off, pull the nodes into open space and<br />  maybe it will correct itself! :)
+            <b>⚠️ Under Construction!</b> <br /> 
+            If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
           </p>
 
         {loading ? (
@@ -317,6 +340,7 @@ function App() {
         ) : (
           <>
             <ForceGraph2D
+              ref={fgRef} // Attach the ForceGraph2D reference
               graphData={graphData}
               nodeCanvasObject={paintNode}
               linkCurvature={0.0}
@@ -339,13 +363,13 @@ function App() {
                   position: 'absolute',
                   top: `${tooltipPos.y}px`,
                   left: `${tooltipPos.x}px`,
-                  padding: '10px',
+                  padding: '15px',
                   color: 'white',
                   backgroundColor: '#505050',
                   pointerEvents: 'auto',
                   zIndex: 1000,
-                  width: `15%`,
-                  fontSize: '60%',
+                  width: `25%`,
+                  fontSize: '70%',
                   whiteSpace: 'normal',
                 }}
               >
