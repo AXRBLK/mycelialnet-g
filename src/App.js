@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import axios from 'axios';
-import { forceLink, forceCollide, forceManyBody, forceCenter } from 'd3-force';
+import { forceLink, forceManyBody, forceCenter } from 'd3-force';
 
 function App() {
   const [nodes, setNodes] = useState([]);
@@ -42,7 +42,7 @@ function App() {
     const fetchData = async () => {
       const sheetId = '1Ci4Hay8-cHgqq9L8LZV6WIH5rgn8BVJa6018xEmdKTo';
       const apiKey = 'AIzaSyCvCL5fqdrjGj_WjMt_fVDpPLWYSSLRjs8';
-      const range = 'Main!A1:L500';
+      const range = 'Main!A1:M500';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
       try {
@@ -88,15 +88,16 @@ function App() {
 
           rows.forEach((row, index) => {
             if (index === 0) return; // Skip header row
-            const [node, category, description, url, country, , , tooltip] = row;
+            const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
 
             const countryCategoryKey = `${country}-${category}`;
+            const countryDisplayName = row[12] || country; // Use column L (index 11) for country name
 
             if (country) {
-              if (!countryNodes[country]) {
-                countryNodes[country] = { id: country, depth: 1, color: colorScheme[1] };
-                nodeData.push(countryNodes[country]);
-                linkData.push({ source: level0Text, target: country });
+              if (!countryNodes[countryDisplayName]) {
+                countryNodes[countryDisplayName] = { id: countryDisplayName, depth: 1, color: colorScheme[1] };
+                nodeData.push(countryNodes[countryDisplayName]);
+                linkData.push({ source: level0Text, target: countryDisplayName });
               }
 
               if (!categoryNodes[countryCategoryKey]) {
@@ -108,7 +109,7 @@ function App() {
                   tooltip: tooltip || `Category: ${category}`,
                 };
                 nodeData.push(categoryNodes[countryCategoryKey]);
-                linkData.push({ source: country, target: countryCategoryKey });
+                linkData.push({ source: countryDisplayName, target: countryCategoryKey });
               }
 
               nodeData.push({
@@ -178,6 +179,7 @@ function App() {
       fontSize *= 1.5;
       ctx.font = `bold ${fontSize}px "Courier New" `;
     } else {
+      fontSize *= 1.25;
       ctx.font = `bold ${fontSize}px "Courier New"`;
     }
 
@@ -220,7 +222,6 @@ function App() {
 
       if (clickedNode && clickedNode.id === node.id) {
         ctx.lineWidth = 4;
-        //ctx.strokeStyle = '#83ff66';
         ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
       }
 
@@ -228,7 +229,7 @@ function App() {
       ctx.fillText(text, node.x, node.y);
     }
 
-    node.bckgDimensions = bckgDimensions || [circleRadius * 3, circleRadius * 3];
+    node.bckgDimensions = bckgDimensions || [circleRadius * 4, circleRadius * 4];
   };
 
   const handleNodeClick = (node, event) => {
