@@ -295,7 +295,7 @@ function App() {
         }}
         onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
       >
-        <h1>MycelialNet🌍</h1>
+        <h1>MycelialNet🌐</h1>
         <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
           <label>
             <input
