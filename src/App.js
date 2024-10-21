@@ -12,7 +12,7 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
   const fgRef = useRef();
 
-  const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#33FFF9'];
+  const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#ffffff'];
   const circleRadius = 10;
 
   const level0Text = "🌍";
@@ -42,7 +42,7 @@ function App() {
     const fetchData = async () => {
       const sheetId = '1Ci4Hay8-cHgqq9L8LZV6WIH5rgn8BVJa6018xEmdKTo';
       const apiKey = 'AIzaSyCvCL5fqdrjGj_WjMt_fVDpPLWYSSLRjs8';
-      const range = 'Main!A1:M500';
+      const range = 'Main!A1:N500';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
       try {
@@ -178,6 +178,9 @@ function App() {
     } else if (node.depth === 2) {
       fontSize *= 1.5;
       ctx.font = `bold ${fontSize}px "Courier New" `;
+    } else if (node.depth === 3) {
+      fontSize *= 1.5;
+      ctx.font = `bold ${fontSize}px "Courier New" `;
     } else {
       fontSize *= 1.25;
       ctx.font = `bold ${fontSize}px "Courier New"`;
@@ -229,7 +232,7 @@ function App() {
       ctx.fillText(text, node.x, node.y);
     }
 
-    node.bckgDimensions = bckgDimensions || [circleRadius * 4, circleRadius * 4];
+    node.bckgDimensions = bckgDimensions || [circleRadius * 5, circleRadius * 5];
   };
 
   const handleNodeClick = (node, event) => {
@@ -347,10 +350,10 @@ function App() {
               linkCurvature={0.0}
               nodeAutoColorBy="depth"
               d3Force={(forceSimulation) => {
-                forceSimulation.force('link', forceLink().id((d) => d.id).distance(400));
+                forceSimulation.force('link', forceLink().id((d) => d.id).distance(-500));
 
                 // No collision force to prevent nodes moving around due to tooltips
-                forceSimulation.force('charge', forceManyBody().strength(0));
+                forceSimulation.force('charge', forceManyBody().strength(300));
 
                 // Centering force to keep nodes within the view
                 forceSimulation.force('center', forceCenter(window.innerWidth / 2, window.innerHeight / 2));
