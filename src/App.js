@@ -141,6 +141,14 @@ function App() {
     fetchData();
   }, [viewMode, level0Text]);
 
+  const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+
   const applyConcentricLayout = (nodeData, radiusStep) => {
     const layers = {};
 
@@ -393,6 +401,46 @@ function App() {
             )}
           </>
         )}
+         {/* Scroll to Bottom Button */}
+      <button
+        onClick={scrollToBottom}
+        style={{
+          position: 'fixed',
+          top: '30px',
+          left: '30px',
+          backgroundColor: '#1E2839',
+          color: 'white',
+          borderRadius: '50%',
+          border: 'none',
+          width: '50px',
+          height: '50px',
+          fontSize: '8px',
+          cursor: 'pointer',
+          zIndex: 1000,
+        }}
+      >
+        Full Screen
+      </button>
+{/* Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          backgroundColor: '#1E2839',
+          color: 'white',
+          borderRadius: '50%',
+          border: 'none',
+          width: '50px',
+          height: '50px',
+          fontSize: '20px',
+          cursor: 'pointer',
+          zIndex: 1000,
+        }}
+      >
+        ↥
+      </button>
       </div>
     </div>
   );
