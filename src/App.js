@@ -13,9 +13,9 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
   const fgRef = useRef();
 
-  const [backgroundColor, setBackgroundColor] = useState('#777777'); // Background color
+  const [backgroundColor, setBackgroundColor] = useState('#283347'); // Background color
   const [linkColor, setLinkColor] = useState('#FF0000'); // Link color
-  const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#ffffff'];
+  const colorScheme = ['#fb4d46', '#72a0c1', 'green', '#1E2839', '#1E2839'];
   const circleRadius = 2;
 
   const level0Text = "🌍";
@@ -74,7 +74,7 @@ function App() {
             const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
 
             const countryCategoryKey = `${country}-${category}`;
-            const countryDisplayName = row[12] || country; 
+            const countryDisplayName = row[12] || country;
 
             if (country) {
               if (!countryNodes[countryDisplayName]) {
@@ -101,7 +101,7 @@ function App() {
                 tooltip: tooltip || '',
                 url: url || '',
                 color: colorScheme[3],
-                depth: 3
+                depth: 3,
               });
               linkData.push({ source: countryCategoryKey, target: node });
             }
@@ -127,14 +127,14 @@ function App() {
   const applyConcentricLayout = (nodeData, radiusStep) => {
     const layers = {};
 
-    nodeData.forEach(node => {
+    nodeData.forEach((node) => {
       if (!layers[node.depth]) {
         layers[node.depth] = [];
       }
       layers[node.depth].push(node);
     });
 
-    Object.keys(layers).forEach(depth => {
+    Object.keys(layers).forEach((depth) => {
       const layer = layers[depth];
       const angleStep = (20 * Math.PI) / layer.length;
       layer.forEach((node, i) => {
@@ -149,49 +149,46 @@ function App() {
 
   const graphData = { nodes, links };
 
-  // Helper to generate a sprite for node labels that contains text and emojis
   const generateTextSprite = (text) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    const fontSize = 50;
-    context.font = `${fontSize}px Arial`;
+    const fontSize = 60;
+    context.font = `bold ${fontSize}px Arial`;
 
-    // Adjust canvas width/height dynamically based on text length
-    canvas.width = context.measureText(text).width + 20;
-    canvas.height = fontSize + 20;
+    canvas.width = 800;
+    canvas.height = 300;
 
-    // Redraw the text
-    context.font = `${fontSize}px Arial`;
-    context.fillStyle = 'black';
-    context.fillText(text, 10, fontSize);
+    context.font = `bold ${fontSize}px Courier New`;
+    context.fillStyle = 'white';
+    context.fillText(text, 10, fontSize+20);
 
     const texture = new THREE.CanvasTexture(canvas);
     return texture;
   };
 
-  // Render the node as a sphere with a text label above it that faces the camera
   const renderNode3D = (node) => {
     const group = new THREE.Group();
 
-    // Node sphere
     const material = new THREE.MeshBasicMaterial({ color: node.color || 'orange' });
     const geometry = new THREE.SphereGeometry(circleRadius, 16, 16);
     const sphere = new THREE.Mesh(geometry, material);
     group.add(sphere);
 
-    // Text label using sprite
     const spriteMaterial = new THREE.SpriteMaterial({
       map: generateTextSprite(node.id || ''),
       transparent: true,
     });
     const sprite = new THREE.Sprite(spriteMaterial);
-    sprite.scale.set(15, 7.5, 1); // Adjust size
-    sprite.position.set(0, circleRadius + 5, 0); // Position above the sphere
+    sprite.scale.set(15, 7.5, 1);
+    sprite.position.set(0, circleRadius +1, 2);
+  // The method sprite.position.set(x, y, z) sets the position of the 3D object in the scene. In the context of 3D graphics, the parameters represent the coordinates along the x, y, and z axes, respectively:
+  //x: The position along the horizontal axis (left-right direction).
+  //y: The position along the vertical axis (up-down direction).
+  //z: The position along the depth axis (forward-backward direction).
     group.add(sprite);
 
-    // Ensure text always faces the camera
     sprite.onBeforeRender = (renderer, scene, camera) => {
-      sprite.quaternion.copy(camera.quaternion); // Make the label face the camera
+      sprite.quaternion.copy(camera.quaternion);
     };
 
     return group;
@@ -203,7 +200,7 @@ function App() {
 
     if (node.tooltip && node.tooltip.trim() !== '') {
       setClickedNode(node);
-      setTooltipPos({ x: mouseX, y: mouseY });
+      setTooltipPos({ x: mouseX-1, y: mouseY+1 });
 
       if (fgRef.current) {
         fgRef.current.pauseAnimation();
@@ -219,29 +216,45 @@ function App() {
   };
 
   const handleNodeHover = (node) => {
-    const graphContainer = document.querySelector("canvas");
+    const graphContainer = document.querySelector('canvas');
 
-    if (node && node.tooltip && node.tooltip.trim() !== "") {
-      graphContainer.style.cursor = "zoom-in"; 
+    if (node && node.tooltip && node.tooltip.trim() !== '') {
+      graphContainer.style.cursor = 'zoom-in';
     } else {
-      graphContainer.style.cursor = "default";
+      graphContainer.style.cursor = 'default';
     }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div
-        style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: backgroundColor }}
+        style={{
+          flex: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          backgroundColor: backgroundColor,
+          width: '100%',
+          height: '90vh',
+          boxSizing: 'border-box',
+        }}
         onClick={() => {
           setClickedNode(null);
           if (fgRef.current) {
             fgRef.current.resumeAnimation();
           }
         }}
-        onTouchStart={(e) => e.stopPropagation()} 
+        onTouchStart={(e) => e.stopPropagation()}
       >
-        <h1>MycelialNet🌐</h1>
-        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
+        <h1 style={{color:'white'}}>MycelialNet🌐</h1>
+        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' ,color:'white'}}>
           <label>
             <input
               type="radio"
@@ -263,25 +276,53 @@ function App() {
             Country
           </label>
         </div>
- <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+        <i
+          style={{
+            fontSize: '10px',
+            margin: '0 5px 0 0',
+            backgroundColor: 'green',
+            padding: '5px',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+          }}
+        >
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'white', textDecoration: 'none' }}
+          >
             + Add Company
           </a>
         </i>
-        <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
-          <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
+        <p
+          style={{
+            fontSize: '10px',
+            margin: '5px 5px 20px 0',
+            backgroundColor: 'navy',
+            padding: '5px',
+            borderRadius: '5px',
+            fontWeight: 'bold',
+          }}
+        >
+          <a
+            href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry"
+            style={{ color: 'white', textDecoration: 'none' }}
+          >
             ✉️ Contact
           </a>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center'}}>
-          <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <p style={{ fontSize: '8px', margin: '0 5px 0 0',color:'white' }}>Created by</p>
           <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
-            <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
-        </div>  
-        <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
-          <b>⚠️ Under Construction!</b> <br /> 
-          If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
+            <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} />
+          </a>
+        </div>
+        <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign: 'center',color:'white' }}>
+          <b>⚠️ Under Construction!</b> <br />
+          If things look wild, drag any node into open space and<br /> maybe it will correct itself.. maybe! Get in touch
+          otherwise. :)
         </p>
         {loading ? (
           <p>Loading data...</p>
@@ -338,6 +379,47 @@ function App() {
           </>
         )}
       </div>
+      
+      {/* Scroll to Bottom Button */}
+      <button
+        onClick={scrollToBottom}
+        style={{
+          position: 'fixed',
+          top: '30px',
+          left: '30px',
+          backgroundColor: '#1E2839',
+          color: 'white',
+          borderRadius: '50%',
+          border: 'none',
+          width: '50px',
+          height: '50px',
+          fontSize: '8px',
+          cursor: 'pointer',
+          zIndex: 1000,
+        }}
+      >
+        Full Screen
+      </button>
+{/* Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          backgroundColor: '#1E2839',
+          color: 'white',
+          borderRadius: '50%',
+          border: 'none',
+          width: '50px',
+          height: '50px',
+          fontSize: '20px',
+          cursor: 'pointer',
+          zIndex: 1000,
+        }}
+      >
+        ↥
+      </button>
     </div>
   );
 }
