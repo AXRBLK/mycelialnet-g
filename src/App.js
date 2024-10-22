@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { ForceGraph2D } from 'react-force-graph';
+import { ForceGraph3D } from 'react-force-graph';
 import axios from 'axios';
 import { forceLink, forceManyBody, forceCenter } from 'd3-force';
+import * as THREE from 'three';
 
 function App() {
   const [nodes, setNodes] = useState([]);
@@ -12,31 +13,13 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
   const fgRef = useRef();
 
+  const [backgroundColor, setBackgroundColor] = useState('#777777'); // Background color
+  const [linkColor, setLinkColor] = useState('#FF0000'); // Link color
   const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#ffffff'];
-  const circleRadius = 10;
+  const circleRadius = 2;
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
-
-  const wrapText = (ctx, text, maxWidth) => {
-    const words = text.split(' ');
-    let line = '';
-    const lines = [];
-
-    words.forEach(word => {
-      const testLine = line + word + ' ';
-      const metrics = ctx.measureText(testLine);
-      const testWidth = metrics.width;
-      if (testWidth > maxWidth && line !== '') {
-        lines.push(line);
-        line = word + ' ';
-      } else {
-        line = testLine;
-      }
-    });
-    lines.push(line.trim());
-    return lines;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,7 +74,7 @@ function App() {
             const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
 
             const countryCategoryKey = `${country}-${category}`;
-            const countryDisplayName = row[12] || country; // Use column L (index 11) for country name
+            const countryDisplayName = row[12] || country; 
 
             if (country) {
               if (!countryNodes[countryDisplayName]) {
@@ -159,105 +142,75 @@ function App() {
         const radius = radiusStep * depth;
         node.x = radius * Math.cos(angle);
         node.y = radius * Math.sin(angle);
+        node.z = Math.random() * 100 - 50;
       });
     });
   };
 
   const graphData = { nodes, links };
 
-  const paintNode = (node, ctx, globalScale) => {
-    let fontSize = Math.max(2.5, 3 / globalScale);
-    let bckgDimensions = null;
+  // Helper to generate a sprite for node labels that contains text and emojis
+  const generateTextSprite = (text) => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    const fontSize = 50;
+    context.font = `${fontSize}px Arial`;
 
-    if (node.depth === 0) {
-      fontSize *= 20;
-      ctx.font = `bold ${fontSize}px "Courier New"`;
-    } else if (node.depth === 1) {
-      fontSize *= 1;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
-    } else if (node.depth === 2) {
-      fontSize *= 1.5;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
-    } else if (node.depth === 3) {
-      fontSize *= 1.5;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
-    } else {
-      fontSize *= 1.25;
-      ctx.font = `bold ${fontSize}px "Courier New"`;
-    }
+    // Adjust canvas width/height dynamically based on text length
+    canvas.width = context.measureText(text).width + 20;
+    canvas.height = fontSize + 20;
 
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    // Redraw the text
+    context.font = `${fontSize}px Arial`;
+    context.fillStyle = 'black';
+    context.fillText(text, 10, fontSize);
 
-    // Highlight the clicked node after the tooltip is displayed
-    if (clickedNode && clickedNode.id === node.id) {
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'black';
-    }
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  };
 
-    if (node.depth <= 1) {
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = node.color || 'orange';
-      ctx.fill();
+  // Render the node as a sphere with a text label above it that faces the camera
+  const renderNode3D = (node) => {
+    const group = new THREE.Group();
 
-      if (clickedNode && clickedNode.id === node.id) {
-        ctx.stroke();
-      }
+    // Node sphere
+    const material = new THREE.MeshBasicMaterial({ color: node.color || 'orange' });
+    const geometry = new THREE.SphereGeometry(circleRadius, 16, 16);
+    const sphere = new THREE.Mesh(geometry, material);
+    group.add(sphere);
 
-      ctx.fillStyle = 'black';
-      const maxWidth = 10;
-      const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
-      const textHeight = textLines.length * fontSize + 1;
+    // Text label using sprite
+    const spriteMaterial = new THREE.SpriteMaterial({
+      map: generateTextSprite(node.id || ''),
+      transparent: true,
+    });
+    const sprite = new THREE.Sprite(spriteMaterial);
+    sprite.scale.set(15, 7.5, 1); // Adjust size
+    sprite.position.set(0, circleRadius + 5, 0); // Position above the sphere
+    group.add(sprite);
 
-      textLines.forEach((line, index) => {
-        const lineX = node.x;
-        const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize;
-        ctx.fillText(line, lineX, lineY);
-      });
+    // Ensure text always faces the camera
+    sprite.onBeforeRender = (renderer, scene, camera) => {
+      sprite.quaternion.copy(camera.quaternion); // Make the label face the camera
+    };
 
-    } else {
-      const text = node.name || node.id;
-      const textWidth = ctx.measureText(text).width;
-      bckgDimensions = [textWidth, fontSize];
-      ctx.fillStyle = node.color || 'orange';
-      ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
-
-      if (clickedNode && clickedNode.id === node.id) {
-        ctx.lineWidth = 4;
-        ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
-      }
-
-      ctx.fillStyle = 'black';
-      ctx.fillText(text, node.x, node.y);
-    }
-
-    node.bckgDimensions = bckgDimensions || [circleRadius * 5, circleRadius * 5];
+    return group;
   };
 
   const handleNodeClick = (node, event) => {
     const mouseX = event.clientX || event.touches?.[0]?.clientX || 0;
     const mouseY = event.clientY || event.touches?.[0]?.clientY || 0;
 
-    // Prevent tooltip for level 2 nodes in 'Country' view mode
-    if (viewMode === 'Country' && node.depth === 2) {
-      setClickedNode(null);
-      return;
-    }
-
-    // Only show tooltip if the node has a non-empty tooltip
     if (node.tooltip && node.tooltip.trim() !== '') {
       setClickedNode(node);
-      setTooltipPos({ x: mouseX -10, y: mouseY -10 });
+      setTooltipPos({ x: mouseX, y: mouseY });
 
-      // Pause the simulation when a tooltip is shown
       if (fgRef.current) {
         fgRef.current.pauseAnimation();
       }
     } else {
       setClickedNode(null);
 
-      // Resume the simulation when the tooltip is closed
       if (fgRef.current) {
         fgRef.current.resumeAnimation();
       }
@@ -268,14 +221,8 @@ function App() {
   const handleNodeHover = (node) => {
     const graphContainer = document.querySelector("canvas");
 
-    // Disable hover effect for level 2 nodes in 'Country' view mode
-    if (viewMode === 'Country' && node?.depth === 2) {
-      graphContainer.style.cursor = "default";
-      return;
-    }
-
     if (node && node.tooltip && node.tooltip.trim() !== "") {
-      graphContainer.style.cursor = "zoom-in"; // Show magnifying glass if tooltip exists
+      graphContainer.style.cursor = "zoom-in"; 
     } else {
       graphContainer.style.cursor = "default";
     }
@@ -284,16 +231,14 @@ function App() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div
-        style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', backgroundColor: backgroundColor }}
         onClick={() => {
           setClickedNode(null);
-
-          // Resume the simulation when the tooltip is closed
           if (fgRef.current) {
             fgRef.current.resumeAnimation();
           }
         }}
-        onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
+        onTouchStart={(e) => e.stopPropagation()} 
       >
         <h1>MycelialNet🌐</h1>
         <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
@@ -318,48 +263,47 @@ function App() {
             Country
           </label>
         </div>
-            <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+ <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
           <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
             + Add Company
           </a>
         </i>
-         <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+        <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
           <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
           </a>
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center'}}>
-            <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
-              <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
-                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
-         </div>  
-          <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
-            <b>⚠️ Under Construction!</b> <br /> 
-            If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
-          </p>
-
+          <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
+          <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
+            <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
+        </div>  
+        <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
+          <b>⚠️ Under Construction!</b> <br /> 
+          If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
+        </p>
         {loading ? (
           <p>Loading data...</p>
         ) : (
           <>
-            <ForceGraph2D
-              ref={fgRef} // Attach the ForceGraph2D reference
+            <ForceGraph3D
+              ref={fgRef}
               graphData={graphData}
-              nodeCanvasObject={paintNode}
+              nodeThreeObject={renderNode3D}
               linkCurvature={0.0}
+              linkColor={linkColor}
               nodeAutoColorBy="depth"
+              backgroundColor={backgroundColor}
               d3Force={(forceSimulation) => {
-                forceSimulation.force('link', forceLink().id((d) => d.id).distance(-500));
+                forceSimulation.force('link', forceLink().id((d) => d.id).distance(200));
 
-                // No collision force to prevent nodes moving around due to tooltips
                 forceSimulation.force('charge', forceManyBody().strength(300));
 
-                // Centering force to keep nodes within the view
-                forceSimulation.force('center', forceCenter(window.innerWidth / 2, window.innerHeight / 2));
+                forceSimulation.force('center', forceCenter(0, 0, 0));
               }}
               onNodeClick={handleNodeClick}
-              onNodeHover={handleNodeHover} // Set hover effect
+              onNodeHover={handleNodeHover}
             />
             {clickedNode && (
               <div
@@ -378,7 +322,7 @@ function App() {
                 }}
               >
                 {clickedNode.tooltip}
-                 <br />
+                <br />
                 {clickedNode.url && (
                   <a
                     href={clickedNode.url}
