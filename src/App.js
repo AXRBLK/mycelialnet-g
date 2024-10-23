@@ -16,7 +16,7 @@ function App() {
   const [backgroundColor, setBackgroundColor] = useState('#283347'); // Background color
   const [linkColor, setLinkColor] = useState('#FF0000'); // Link color
   const colorScheme = ['#fb4d46', '#72a0c1', 'green', '#1E2839', '#1E2839'];
-  const circleRadius = 2;
+  const circleRadius = 2.5;
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
@@ -385,10 +385,10 @@ function App() {
         onClick={scrollToBottom}
         style={{
           position: 'fixed',
-          top: '30px',
-          left: '30px',
-          backgroundColor: '#1E2839',
-          color: 'white',
+          bottom: '90px',
+          right: '30px',
+          backgroundColor: 'lightblue',
+          color: 'black',
           borderRadius: '50%',
           border: 'none',
           width: '50px',
@@ -407,8 +407,8 @@ function App() {
           position: 'fixed',
           bottom: '30px',
           right: '30px',
-          backgroundColor: '#1E2839',
-          color: 'white',
+          backgroundColor: 'lightblue',
+          color: 'black',
           borderRadius: '50%',
           border: 'none',
           width: '50px',
