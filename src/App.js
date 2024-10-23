@@ -303,8 +303,8 @@ function App() {
         }}
         onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
       >
-        <h1>MycelialNet🌐</h1>
-        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' }}>
+        <h1 style={{marginBottom:'5px'}}>MycelialNet🌐</h1>
+        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '15px', backgroundColor:'#777777', borderRadius: '5px', color:'white',padding:'10px' }}>
           <label>
             <input
               type="radio"
@@ -326,16 +326,18 @@ function App() {
             Country 🌍
           </label>
         </div>
-            <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
-            + Add Company
-          </a>
-        </i>
-         <p style={{ fontSize: '10px', margin: '5px 5px 20px 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
-          <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
+          <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+              + Add Company
+            </a>
+          </i>
+          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
+            <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
-          </a>
-        </p>
+            </a>
+          </p>
+        </div>
 
           <p style={{ fontSize: '11px', margin: '0 0 20px 0', textAlign:"center" }}>
             <b>⚠️ Under Construction!</b> <br /> 
