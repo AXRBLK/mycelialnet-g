@@ -216,7 +216,7 @@ function App() {
       ctx.fillStyle = 'black';
       const maxWidth = 10;
       const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
-      const textHeight = textLines.length * fontSize + 1;
+      const textHeight = textLines.length * fontSize;
 
       textLines.forEach((line, index) => {
         const lineX = node.x;
@@ -240,7 +240,7 @@ function App() {
       ctx.fillText(text, node.x, node.y);
     }
 
-    node.bckgDimensions = bckgDimensions || [circleRadius * 5, circleRadius * 5];
+    node.bckgDimensions = bckgDimensions || [circleRadius * 2, circleRadius * 2];
   };
 
   const handleNodeClick = (node, event) => {
@@ -337,11 +337,6 @@ function App() {
           </a>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center'}}>
-            <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
-              <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
-                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
-         </div>  
           <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
             <b>⚠️ Under Construction!</b> <br /> 
             If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
@@ -362,7 +357,7 @@ function App() {
               linkCurvature={0.0}
               nodeAutoColorBy="depth"
               d3Force={(forceSimulation) => {
-                forceSimulation.force('link', forceLink().id((d) => d.id).distance(-500));
+                forceSimulation.force('link', forceLink().id((d) => d.id).distance(-200));
 
                 // No collision force to prevent nodes moving around due to tooltips
                 forceSimulation.force('charge', forceManyBody().strength(300));
@@ -410,7 +405,7 @@ function App() {
         onClick={scrollToBottom}
         style={{
           position: 'fixed',
-          bottom: '90px',
+          bottom: '30px',
           right: '30px',
           backgroundColor: '#66CFFF',
           color: 'black',
@@ -430,7 +425,7 @@ function App() {
         onClick={scrollToTop}
         style={{
           position: 'fixed',
-          bottom: '30px',
+          bottom: '100px',
           right: '30px',
           backgroundColor: '#66CFFF',
           color: 'black',
@@ -445,6 +440,11 @@ function App() {
       >
         ↥
       </button>
+      <div style={{ display: 'flex', alignItems: 'center',position: 'fixed',bottom:'30px',left:'30px'}}>
+            <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
+              <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
+                <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} /></a> 
+         </div>  
       </div>
     </div>
   );
