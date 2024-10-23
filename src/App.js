@@ -347,9 +347,9 @@ function App() {
             If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
           </p>
 
-          <a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
+          {/*<a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
             3D
-          </a>
+          </a> */}
 
         {loading ? (
           <p>Loading data...</p>
