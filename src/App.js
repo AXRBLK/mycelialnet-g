@@ -313,12 +313,7 @@ function App() {
           </a>
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <p style={{ fontSize: '8px', margin: '0 5px 0 0',color:'white' }}>Created by</p>
-          <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
-            <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} />
-          </a>
-        </div>
+        
         <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign: 'center',color:'white' }}>
           <b>⚠️ Under Construction!</b> <br />
           If things look wild, drag any node into open space and<br /> maybe it will correct itself.. maybe! Get in touch
@@ -385,7 +380,7 @@ function App() {
         onClick={scrollToBottom}
         style={{
           position: 'fixed',
-          bottom: '90px',
+          bottom: '30px',
           right: '30px',
           backgroundColor: 'lightblue',
           color: 'black',
@@ -405,7 +400,7 @@ function App() {
         onClick={scrollToTop}
         style={{
           position: 'fixed',
-          bottom: '30px',
+          bottom: '100px',
           right: '30px',
           backgroundColor: 'lightblue',
           color: 'black',
@@ -420,6 +415,15 @@ function App() {
       >
         ↥
       </button>
+      <div style={{ display: 'flex', alignItems: 'center', 
+          position: 'fixed',
+          bottom: '30px',
+          left: '30px', }}>
+          <p style={{ fontSize: '8px', margin: '0 5px 0 0',color:'white' }}>Created by</p>
+          <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
+            <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} />
+          </a>
+        </div>
     </div>
   );
 }
