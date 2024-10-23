@@ -337,7 +337,7 @@ function App() {
           </a>
         </p>
 
-          <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign:"center" }}>
+          <p style={{ fontSize: '11px', margin: '0 0 20px 0', textAlign:"center" }}>
             <b>⚠️ Under Construction!</b> <br /> 
             If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
           </p>
