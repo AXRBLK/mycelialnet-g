@@ -327,7 +327,7 @@ function App() {
           </label>
         </div>
             <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
-          <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+              <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
             + Add Company
           </a>
         </i>
@@ -346,6 +346,10 @@ function App() {
             <b>⚠️ Under Construction!</b> <br /> 
             If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
           </p>
+
+          <a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
+            3D
+          </a>
 
         {loading ? (
           <p>Loading data...</p>
