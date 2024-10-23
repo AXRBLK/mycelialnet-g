@@ -21,12 +21,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    //"predeploy": "npm run build",
-    //"deploy": "gh-pages -d build -b 3D -m 'Deploy 3D'"
-    "predeploy-2Dv2": "npm run build",
-    "deploy-2Dv2": "gh-pages -d build -b 2Dv2 -m 'Deploy 2Dv2'",
-    "predeploy-3D": "npm run build",
-    "deploy-3D": "gh-pages -d build -b gh-pages -r https://github.com/AXRBLK/mycelialnet.git -m 'Deploy 3D' -p /3D"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build -b 3D -m 'Deploy 3D'"
+    
   },
   "eslintConfig": {
     "extends": [
