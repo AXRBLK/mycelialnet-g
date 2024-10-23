@@ -313,7 +313,7 @@ function App() {
               checked={viewMode === 'Industry'}
               onChange={() => setViewMode('Industry')}
             />
-            Industry
+            Industry 🍄‍🟫
           </label>
           <label style={{ marginLeft: '10px' }}>
             <input
@@ -323,7 +323,7 @@ function App() {
               checked={viewMode === 'Country'}
               onChange={() => setViewMode('Country')}
             />
-            Country
+            Country 🌍
           </label>
         </div>
             <i style={{ fontSize: '10px', margin: '0 5px 0 0', backgroundColor: 'green', padding: '5px', borderRadius: '5px', fontWeight: 'bold' }}>
@@ -406,8 +406,8 @@ function App() {
         onClick={scrollToBottom}
         style={{
           position: 'fixed',
-          top: '30px',
-          left: '30px',
+          bottom: '90px',
+          right: '30px',
           backgroundColor: '#66CFFF',
           color: 'black',
           borderRadius: '50%',
@@ -415,7 +415,7 @@ function App() {
           width: '50px',
           height: '50px',
           fontSize: '8px',
-          cursor: 'pointer',
+          cursor: 'zoom-in',
           zIndex: 1000,
         }}
       >
