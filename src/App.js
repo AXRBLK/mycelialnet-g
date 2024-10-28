@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import axios from 'axios';
 import { forceLink, forceManyBody, forceCenter } from 'd3-force';
+import './App.css';
 
 function App() {
   const [nodes, setNodes] = useState([]);
@@ -13,7 +14,7 @@ function App() {
   const fgRef = useRef();
 
   const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#ffffff'];
-  const circleRadius = 10;
+  const circleRadius = 12;
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
@@ -186,19 +187,19 @@ function App() {
 
     if (node.depth === 0) {
       fontSize *= 20;
-      ctx.font = `bold ${fontSize}px "Courier New"`;
+      ctx.font = `bold ${fontSize}px 'Arial'`;
     } else if (node.depth === 1) {
-      fontSize *= 1;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
+      fontSize *= 1.25;
+      ctx.font = `bold ${fontSize}px 'Arial'`;
     } else if (node.depth === 2) {
-      fontSize *= 1.5;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
+      fontSize *= 1.7;
+      ctx.font = `bold ${fontSize}px 'Arial'`;
     } else if (node.depth === 3) {
       fontSize *= 1.5;
-      ctx.font = `bold ${fontSize}px "Courier New" `;
+      ctx.font = `bold ${fontSize}px 'Arial'`;
     } else {
       fontSize *= 1.25;
-      ctx.font = `bold ${fontSize}px "Courier New"`;
+      ctx.font = `bold ${fontSize}px 'Arial'`;
     }
 
     ctx.textAlign = 'center';
@@ -311,7 +312,7 @@ function App() {
         onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
       >
         <h1 style={{marginBottom:'5px'}}>MycelialNet🌐</h1>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'10px' }}>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '22px' }}>
             <input
@@ -336,21 +337,21 @@ function App() {
           </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
-          <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px', }}>
+          <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px' }}>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
               + Add Company
             </a>
           </i>
-          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '7px', borderRadius: '3px', }}>
+          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '8px', borderRadius: '3px', }}>
             <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
             </a>
           </p>
         </div>
 
-          <p style={{ fontSize: '11px', margin: '0 0 20px 0', textAlign:"center" }}>
+          <p style={{ fontSize: '12px', margin: '0 0 10px 0', textAlign:"center" }}>
             <b>⚠️ Under Construction!</b> <br /> 
-            If things look wild, drag any node into open space and<br />  maybe it will correct itself.. maybe! Get in touch otherwise. :)
+            If things look wild, drag any node into open space and maybe it will correct itself.. maybe!  <br /> Get in touch otherwise. :)
           </p>
 
           {/*<a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
