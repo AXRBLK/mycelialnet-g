@@ -15,8 +15,8 @@ function App() {
 
   const [backgroundColor, setBackgroundColor] = useState('#283347'); // Background color
   const [linkColor, setLinkColor] = useState('#FF0000'); // Link color
-  const colorScheme = ['#fb4d46', '#72a0c1', 'green', '#1E2839', '#1E2839'];
-  const circleRadius = 2.5;
+  const colorScheme = ['#fb4d46', '#2C4870', 'green', '#cfff66', '#F0F8FF'];
+  const circleRadius = 2;
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
@@ -66,49 +66,57 @@ function App() {
             node.color = colorScheme[depth];
           });
         } else if (viewMode === 'Country') {
-          const countryNodes = {};
-          const categoryNodes = {};
+    const countryNodes = {};
+    const categoryNodes = {};
 
-          rows.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
-            const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
+    rows.forEach((row, index) => {
+      if (index === 0) return; // Skip header row
+      const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
 
-            const countryCategoryKey = `${country}-${category}`;
-            const countryDisplayName = row[12] || country;
+      const countryCategoryKey = `${country}-${category}`; // Unique ID for internal reference
+      const countryDisplayName = row[12] || country; // Display name for country
 
-            if (country) {
-              if (!countryNodes[countryDisplayName]) {
-                countryNodes[countryDisplayName] = { id: countryDisplayName, depth: 1, color: colorScheme[1] };
-                nodeData.push(countryNodes[countryDisplayName]);
-                linkData.push({ source: level0Text, target: countryDisplayName });
-              }
-
-              if (!categoryNodes[countryCategoryKey]) {
-                categoryNodes[countryCategoryKey] = {
-                  id: countryCategoryKey,
-                  name: category,
-                  depth: 2,
-                  color: colorScheme[2],
-                  tooltip: tooltip || `Category: ${category}`,
-                };
-                nodeData.push(categoryNodes[countryCategoryKey]);
-                linkData.push({ source: countryDisplayName, target: countryCategoryKey });
-              }
-
-              nodeData.push({
-                id: node,
-                description: description || '',
-                tooltip: tooltip || '',
-                url: url || '',
-                color: colorScheme[3],
-                depth: 3,
-              });
-              linkData.push({ source: countryCategoryKey, target: node });
-            }
-          });
-
-          nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
+      if (country) {
+        // Create country node if not already added
+        if (!countryNodes[countryDisplayName]) {
+          countryNodes[countryDisplayName] = { 
+            id: countryDisplayName, 
+            depth: 1, 
+            color: colorScheme[1]
+          };
+          nodeData.push(countryNodes[countryDisplayName]);
+          linkData.push({ source: level0Text, target: countryDisplayName });
         }
+
+        // Create category node for each country-category pair
+        if (!categoryNodes[countryCategoryKey]) {
+          categoryNodes[countryCategoryKey] = {
+            id: countryCategoryKey, // Unique ID for backend
+            name: category, // Display only the category
+            depth: 2,
+            color: colorScheme[2],
+            
+          };
+          nodeData.push(categoryNodes[countryCategoryKey]);
+          linkData.push({ source: countryDisplayName, target: countryCategoryKey });
+        }
+
+        // Level 3 nodes (individual nodes)
+        nodeData.push({
+          id: node,
+          description: description || '',
+          tooltip: tooltip || '',
+          url: url || '',
+          color: colorScheme[3],
+          depth: 3,
+        });
+        linkData.push({ source: countryCategoryKey, target: node });
+      }
+    });
+
+    // Add the level 0 node
+    nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
+  }
 
         applyConcentricLayout(nodeData, 300);
 
@@ -152,14 +160,14 @@ function App() {
   const generateTextSprite = (text) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    const fontSize = 60;
+    const fontSize = 100;
     context.font = `bold ${fontSize}px Arial`;
 
-    canvas.width = 800;
+    canvas.width = 700;
     canvas.height = 300;
 
-    context.font = `bold ${fontSize}px Courier New`;
-    context.fillStyle = 'white';
+    context.font = `bold ${fontSize}px Arial`;
+    context.fillStyle = '#505050';
     context.fillText(text, 10, fontSize+20);
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -180,7 +188,7 @@ function App() {
     });
     const sprite = new THREE.Sprite(spriteMaterial);
     sprite.scale.set(15, 7.5, 1);
-    sprite.position.set(0, circleRadius +1, 2);
+    sprite.position.set(0, circleRadius+4, -5);
   // The method sprite.position.set(x, y, z) sets the position of the 3D object in the scene. In the context of 3D graphics, the parameters represent the coordinates along the x, y, and z axes, respectively:
   //x: The position along the horizontal axis (left-right direction).
   //y: The position along the vertical axis (up-down direction).
@@ -253,9 +261,10 @@ function App() {
         }}
         onTouchStart={(e) => e.stopPropagation()}
       >
-        <h1 style={{color:'white'}}>MycelialNet🌐</h1>
-        <div style={{ alignItems: 'center', textAlign: 'center', marginBottom: '20px' ,color:'white'}}>
-          <label>
+        <h1 style={{marginBottom:'5px', color:'#cfff66'}}>MycelialNet🌐</h1>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px' }}>
+          Select View ↠
+          <label style={{ marginLeft: '15px',marginRight: '22px' }}>
             <input
               type="radio"
               name="viewMode"
@@ -263,9 +272,10 @@ function App() {
               checked={viewMode === 'Industry'}
               onChange={() => setViewMode('Industry')}
             />
-            Industry
+            INDUSTRY 🍄‍🟫
           </label>
-          <label style={{ marginLeft: '10px' }}>
+            |
+          <label style={{ marginLeft: '15px' }}>
             <input
               type="radio"
               name="viewMode"
@@ -273,52 +283,30 @@ function App() {
               checked={viewMode === 'Country'}
               onChange={() => setViewMode('Country')}
             />
-            Country
+            COUNTRY 🌍
           </label>
         </div>
-        <i
-          style={{
-            fontSize: '10px',
-            margin: '0 5px 0 0',
-            backgroundColor: 'green',
-            padding: '5px',
-            borderRadius: '5px',
-            fontWeight: 'bold',
-          }}
-        >
-          <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'white', textDecoration: 'none' }}
-          >
-            + Add Company
-          </a>
-        </i>
-        <p
-          style={{
-            fontSize: '10px',
-            margin: '5px 5px 20px 0',
-            backgroundColor: 'navy',
-            padding: '5px',
-            borderRadius: '5px',
-            fontWeight: 'bold',
-          }}
-        >
-          <a
-            href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry"
-            style={{ color: 'white', textDecoration: 'none' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
+          <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px' }}>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
+              + Add Company
+            </a>
+          </i>
+          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '8px', borderRadius: '3px', }}>
+            <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
-          </a>
-        </p>
+            </a>
+          </p>
+        </div>
 
-        
-        <p style={{ fontSize: '8px', margin: '0 0 20px 0', textAlign: 'center',color:'white' }}>
-          <b>⚠️ Under Construction!</b> <br />
-          If things look wild, drag any node into open space and<br /> maybe it will correct itself.. maybe! Get in touch
-          otherwise. :)
-        </p>
+          <p style={{ color:'#d3d3d3',fontSize: '12px', margin: '0 0 10px 0', textAlign:"center" }}>
+            <b>⚠️ Under Construction!</b> <br /> 
+            If things look wild, drag any node into open space and maybe it will correct itself.. maybe!  <br /> Get in touch otherwise. :)
+          </p>
+
+          {/*<a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
+            3D
+          </a> */}
         {loading ? (
           <p>Loading data...</p>
         ) : (
