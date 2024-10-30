@@ -391,7 +391,7 @@ function App() {
                   backgroundColor: '#505050',
                   pointerEvents: 'auto',
                   zIndex: 1000,
-                  width: `25%`,
+                  width: `40%`,
                   fontSize: '70%',
                   whiteSpace: 'normal',
                 }}
