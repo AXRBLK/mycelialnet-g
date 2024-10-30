@@ -39,10 +39,17 @@ function App() {
           const parentMap = {};
           rows.forEach((row, index) => {
             if (index === 0) return; // Skip header row
-            const [node, parent, description, url, , , , tooltip, , , , displayName] = row;
+            const [node, parent, description, url, , , linkedinUrl, tooltip, , , , displayName] = row;
             const nodeName = displayName || node;
 
-            nodeData.push({ id: nodeName, description: description || '', tooltip: tooltip || '', url: url || '' });
+            // Only add linkedinUrl if it's not blank
+            nodeData.push({
+              id: nodeName,
+              description: description || '',
+              tooltip: tooltip || '',
+              url: url || '',
+              linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null // Populate only if not blank
+            });
 
             if (parent) {
               parentMap[nodeName] = parent;
@@ -71,7 +78,7 @@ function App() {
 
     rows.forEach((row, index) => {
       if (index === 0) return; // Skip header row
-      const [node, category, description, url, country, , , tooltip, , , , displayName] = row;
+      const [node, category, description, url, country, , linkedinUrl, tooltip, , , , displayName] = row;
 
       const countryCategoryKey = `${country}-${category}`; // Unique ID for internal reference
       const countryDisplayName = row[12] || country; // Display name for country
@@ -103,16 +110,17 @@ function App() {
 
         // Level 3 nodes (individual nodes)
         nodeData.push({
-          id: node,
-          description: description || '',
-          tooltip: tooltip || '',
-          url: url || '',
-          color: colorScheme[3],
-          depth: 3,
-        });
-        linkData.push({ source: countryCategoryKey, target: node });
-      }
-    });
+                id: node,
+                description: description || '',
+                tooltip: tooltip || '',
+                url: url || '',
+                linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null, // Add LinkedIn URL only if not blank
+                color: colorScheme[3],
+                depth: 3
+              });
+              linkData.push({ source: countryCategoryKey, target: node });
+            }
+          });
 
     // Add the level 0 node
     nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
@@ -160,14 +168,14 @@ function App() {
   const generateTextSprite = (text) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
-    const fontSize = 100;
+    const fontSize = 50;
     context.font = `bold ${fontSize}px Arial`;
 
     canvas.width = 700;
     canvas.height = 300;
 
     context.font = `bold ${fontSize}px Arial`;
-    context.fillStyle = '#505050';
+    context.fillStyle = 'white';
     context.fillText(text, 10, fontSize+20);
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -329,7 +337,7 @@ function App() {
               onNodeClick={handleNodeClick}
               onNodeHover={handleNodeHover}
             />
-            {clickedNode && (
+             {clickedNode && (
               <div
                 style={{
                   position: 'absolute',
@@ -340,78 +348,91 @@ function App() {
                   backgroundColor: '#505050',
                   pointerEvents: 'auto',
                   zIndex: 1000,
-                  width: `25%`,
+                  width: `40%`,
                   fontSize: '70%',
                   whiteSpace: 'normal',
                 }}
               >
                 {clickedNode.tooltip}
                 <br />
-                {clickedNode.url && (
+                <br />
+                
+                {/* LinkedIn link */}
+                {clickedNode.linkedinUrl && (
+                  <a
+                    href={clickedNode.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{pointerEvents: 'auto' }}
+                  >
+                    <img src={`${process.env.PUBLIC_URL}/linkedin.png`} alt="LinkedIn" style={{ width: '15px', marginLeft: '10px' }} />
+                  </a>
+                )}{clickedNode.url && (
                   <a
                     href={clickedNode.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: 'lightblue', marginLeft: '10px', pointerEvents: 'auto' }}
+                    style={{ color: 'lightblue', margin: '5px 5px 5px 10px', pointerEvents: 'auto', textDecoration:'none' }}
                   >
                     {linkText}
                   </a>
                 )}
+                
+                <br />
+                
+                
+                
+                
+                
               </div>
             )}
           </>
         )}
-      </div>
-      
-      {/* Scroll to Bottom Button */}
-      <button
-        onClick={scrollToBottom}
-        style={{
-          position: 'fixed',
-          bottom: '30px',
-          right: '30px',
-          backgroundColor: 'lightblue',
-          color: 'black',
-          borderRadius: '50%',
-          border: 'none',
-          width: '50px',
-          height: '50px',
-          fontSize: '8px',
-          cursor: 'pointer',
-          zIndex: 1000,
-        }}
-      >
-        Full Screen
-      </button>
-{/* Scroll to Top Button */}
-      <button
-        onClick={scrollToTop}
-        style={{
-          position: 'fixed',
-          bottom: '100px',
-          right: '30px',
-          backgroundColor: 'lightblue',
-          color: 'black',
-          borderRadius: '50%',
-          border: 'none',
-          width: '50px',
-          height: '50px',
-          fontSize: '20px',
-          cursor: 'pointer',
-          zIndex: 1000,
-        }}
-      >
-        ↥
-      </button>
-      <div style={{ display: 'flex', alignItems: 'center', 
-          position: 'fixed',
-          bottom: '30px',
-          left: '30px', }}>
-          <p style={{ fontSize: '8px', margin: '0 5px 0 0',color:'white' }}>Created by</p>
+        <button
+          onClick={scrollToBottom}
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            backgroundColor: '#66CFFF',
+            color: 'black',
+            borderRadius: '50%',
+            border: 'none',
+            width: '50px',
+            height: '50px',
+            fontSize: '8px',
+            cursor: 'zoom-in',
+            zIndex: 1000,
+          }}
+        >
+          Full Screen
+        </button>
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: '100px',
+            right: '30px',
+            backgroundColor: '#66CFFF',
+            color: 'black',
+            borderRadius: '50%',
+            border: 'none',
+            width: '50px',
+            height: '50px',
+            fontSize: '20px',
+            cursor: 'pointer',
+            zIndex: 1000,
+          }}
+        >
+          ↥
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', position: 'fixed', bottom: '30px', left: '30px' }}>
+          <p style={{ fontSize: '8px', margin: '0 5px 0 0' }}>Created by</p>
           <a href="https://www.linkedin.com/in/alblunk/" target="_blank" rel="noopener noreferrer">
             <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} />
-          </a>
-        </div>
+          </a> 
+        </div>  
+      </div>
     </div>
   );
 }
