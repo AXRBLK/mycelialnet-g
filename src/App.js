@@ -13,10 +13,10 @@ function App() {
   const [viewMode, setViewMode] = useState('Industry');
   const fgRef = useRef();
 
-  const [backgroundColor, setBackgroundColor] = useState('#283347'); // Background color
+  const [backgroundColor, setBackgroundColor] = useState('#303646'); // Background color
   const [linkColor, setLinkColor] = useState('#FF0000'); // Link color
-  const colorScheme = ['#fb4d46', '#2C4870', 'green', '#cfff66', '#F0F8FF'];
-  const circleRadius = 2;
+  const colorScheme = ['hotpink', '#cfff66','#66CFFF', '#14190a', '#000000'];
+  const circleRadius = 3.5;
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
@@ -126,7 +126,7 @@ function App() {
     nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
   }
 
-        applyConcentricLayout(nodeData, 300);
+        applyConcentricLayout(nodeData, 5);
 
         setNodes(nodeData);
         setLinks(linkData);
@@ -175,7 +175,7 @@ function App() {
     canvas.height = 300;
 
     context.font = `bold ${fontSize}px Arial`;
-    context.fillStyle = 'white';
+    context.fillStyle = 'white'; //node text color
     context.fillText(text, 10, fontSize+20);
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -196,7 +196,7 @@ function App() {
     });
     const sprite = new THREE.Sprite(spriteMaterial);
     sprite.scale.set(15, 7.5, 1);
-    sprite.position.set(0, circleRadius+4, -5);
+    sprite.position.set(0, circleRadius-2,7);
   // The method sprite.position.set(x, y, z) sets the position of the 3D object in the scene. In the context of 3D graphics, the parameters represent the coordinates along the x, y, and z axes, respectively:
   //x: The position along the horizontal axis (left-right direction).
   //y: The position along the vertical axis (up-down direction).
@@ -270,7 +270,7 @@ function App() {
         onTouchStart={(e) => e.stopPropagation()}
       >
         <h1 style={{marginBottom:'5px', color:'#cfff66'}}>MycelialNet🌐</h1>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px' }}>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'12px 18px 12px 18px' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '22px' }}>
             <input
