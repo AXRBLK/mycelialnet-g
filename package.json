@@ -2,7 +2,8 @@
   "name": "mycelialnet",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://axrblk.github.io/mycelialnet-g/3D",
+  "homepage": "https://axrblk.github.io/mycelialnet-g/",
+  //"homepage": "https://axrblk.github.io/mycelialnet-g/3D" - 
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -22,7 +23,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build -b gh-pages -p /3D"
+    //"deploy": "gh-pages -d build -b gh-pages -p /3D"
+    "deploy": "gh-pages -d build -b 3D -m 'Deploy 3D'" 
     
   },
   "eslintConfig": {
