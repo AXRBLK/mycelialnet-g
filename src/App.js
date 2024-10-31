@@ -196,10 +196,10 @@ function App() {
       ctx.font = `bold ${fontSize}px 'Arial'`;
     } else if (node.depth === 3) {
       fontSize *= 1.5;
-      ctx.font = `bold ${fontSize}px 'Arial'`;
+      ctx.font = ` ${fontSize}px 'Arial'`;
     } else {
       fontSize *= 1.25;
-      ctx.font = `bold ${fontSize}px 'Arial'`;
+      ctx.font = ` ${fontSize}px 'Arial'`;
     }
 
     ctx.textAlign = 'center';
