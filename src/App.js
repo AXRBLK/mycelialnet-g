@@ -37,7 +37,6 @@ function App() {
     <strong style={{fontSize:'2em'}}>🌲</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
-    <strong style={{fontSize:'.3em'}}>🍄</strong>
     </p>
     <p>:)</p>
   </div>
