@@ -11,33 +11,17 @@ function App() {
   const [clickedNode, setClickedNode] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
   const [viewMode, setViewMode] = useState('Industry');
+  
   const fgRef = useRef();
 
-  const colorScheme = ['#ffffff', '#66CFFF', '#cfff66', '#ffffff', '#ffffff'];
-  const circleRadius = 12;
+  const colorScheme = ['#ffffff', '#cfff66', '#66CFFF', 'transparent', 'transparent'];
+  const circleRadius = 10;
+ 
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
 
-  const wrapText = (ctx, text, maxWidth) => {
-    const words = text.split(' ');
-    let line = '';
-    const lines = [];
 
-    words.forEach(word => {
-      const testLine = line + word + ' ';
-      const metrics = ctx.measureText(testLine);
-      const testWidth = metrics.width;
-      if (testWidth > maxWidth && line !== '') {
-        lines.push(line);
-        line = word + ' ';
-      } else {
-        line = testLine;
-      }
-    });
-    lines.push(line.trim());
-    return lines;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,7 +120,7 @@ function App() {
           nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
         }
 
-        applyConcentricLayout(nodeData, 300);
+        applyGridLayout(nodeData);
 
         setNodes(nodeData);
         setLinks(linkData);
@@ -157,99 +141,111 @@ function App() {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
 
-  const applyConcentricLayout = (nodeData, radiusStep) => {
-    const layers = {};
 
+  const applyGridLayout = (nodeData) => {
+    const parentNodes = {};
     nodeData.forEach(node => {
-      if (!layers[node.depth]) {
-        layers[node.depth] = [];
-      }
-      layers[node.depth].push(node);
+      if (!parentNodes[node.depth]) parentNodes[node.depth] = [];
+      parentNodes[node.depth].push(node);
     });
 
-    Object.keys(layers).forEach(depth => {
-      const layer = layers[depth];
-      const angleStep = (20 * Math.PI) / layer.length;
-      layer.forEach((node, i) => {
-        const angle = i * angleStep;
-        const radius = radiusStep * depth;
-        node.x = radius * Math.cos(angle);
-        node.y = radius * Math.sin(angle);
+    Object.keys(parentNodes).forEach(depth => {
+      const nodes = parentNodes[depth];
+      const gridSize = Math.ceil(Math.sqrt(nodes.length));
+      const spacing = 1 * depth;
+
+      nodes.forEach((node, i) => {
+        const xPos = (i % gridSize) * spacing - (gridSize / 2) * spacing+5;
+        const yPos = Math.floor(i / gridSize) * spacing - (gridSize / 2) * spacing;
+        node.x = xPos;
+        node.y = yPos;
       });
     });
   };
 
   const graphData = { nodes, links };
 
-  const paintNode = (node, ctx, globalScale) => {
-    let fontSize = Math.max(2.5, 3 / globalScale);
-    let bckgDimensions = null;
+const wrapText = (ctx, text, maxWidth) => {
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
 
-    if (node.depth === 0) {
-      fontSize *= 20;
-      ctx.font = `bold ${fontSize}px 'Arial'`;
-    } else if (node.depth === 1) {
-      fontSize *= 1.25;
-      ctx.font = `bold ${fontSize}px 'Arial'`;
+    words.forEach(word => {
+        const testLine = line + word + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+        if (testWidth > maxWidth && line !== '') {
+            lines.push(line);
+            line = word + ' ';
+        } else {
+            line = testLine;
+        }
+    });
+    lines.push(line.trim());
+    return lines;
+};
+
+const paintNode = (node, ctx, globalScale) => {
+    const baseFontSize = Math.max(2.5, 3 / globalScale);
+    let fontSize = baseFontSize;
+    let maxWidth = 10;
+    
+    // Set node-specific text and background properties based on depth
+    if (node.depth === 3) {
+        fontSize *= 1;
+        maxWidth = 3;
     } else if (node.depth === 2) {
-      fontSize *= 1.7;
-      ctx.font = `bold ${fontSize}px 'Arial'`;
-    } else if (node.depth === 3) {
-      fontSize *= 1.5;
-      ctx.font = ` ${fontSize}px 'Arial'`;
-    } else {
-      fontSize *= 1.25;
-      ctx.font = ` ${fontSize}px 'Arial'`;
+        fontSize *= 1;
+        maxWidth = 18;
+    } else if (node.depth === 1) {
+        fontSize *= 1;
+        maxWidth = 5;
+    } else if (node.depth === 0) {
+        fontSize *= 20;
+        maxWidth = 80;
     }
-
+    
+    ctx.font = `${fontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // Highlight the clicked node after the tooltip is displayed
-    if (clickedNode && clickedNode.id === node.id) {
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = 'black';
-    }
+    // Draw background for Level 2+ nodes to help with readability
+    if (node.depth >= 2) {
+        const textLines = wrapText(ctx, node.id, maxWidth);
+        const textHeight = textLines.length * fontSize;
 
-    if (node.depth <= 1) {
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = node.color || 'orange';
-      ctx.fill();
+        ctx.fillStyle = node.color || 'orange';
+        ctx.fillRect(
+            node.x - maxWidth / 2 - 5,
+            node.y - textHeight / 2 - 5,
+            maxWidth + 10,
+            textHeight + 10
+        );
 
-      if (clickedNode && clickedNode.id === node.id) {
-        ctx.stroke();
-      }
-
-      ctx.fillStyle = 'black';
-      const maxWidth = 10;
-      const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
-      const textHeight = textLines.length * fontSize;
-
-      textLines.forEach((line, index) => {
-        const lineX = node.x;
-        const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize;
-        ctx.fillText(line, lineX, lineY);
-      });
-
+        ctx.fillStyle = 'black';
+        textLines.forEach((line, index) => {
+            const lineX = node.x;
+            const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize; // Center each line vertically
+            ctx.fillText(line, lineX, lineY);
+        });
     } else {
-      const text = node.name || node.id;
-      const textWidth = ctx.measureText(text).width;
-      bckgDimensions = [textWidth, fontSize];
-      ctx.fillStyle = node.color || 'orange';
-      ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
+        // For levels <= 1, draw a circle and place text in the center
+        ctx.fillStyle = node.color || 'orange';
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
+        ctx.fill();
 
-      if (clickedNode && clickedNode.id === node.id) {
-        ctx.lineWidth = 4;
-        ctx.strokeRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, bckgDimensions[0], bckgDimensions[1]);
-      }
+        ctx.fillStyle = 'black';
+        const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
+        const textHeight = textLines.length * fontSize;
 
-      ctx.fillStyle = 'black';
-      ctx.fillText(text, node.x, node.y);
+        textLines.forEach((line, index) => {
+            const lineX = node.x;
+            const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize; // Center each line vertically
+            ctx.fillText(line, lineX, lineY);
+        });
     }
-
-    node.bckgDimensions = bckgDimensions || [circleRadius * 2, circleRadius * 2];
-  };
+};
 
   const handleNodeClick = (node, event) => {
     const mouseX = event.clientX || event.touches?.[0]?.clientX || 0;
@@ -337,12 +333,13 @@ function App() {
           </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
+        
           <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px' }}>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
               + Add Company
             </a>
           </i>
-          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '8px', borderRadius: '3px', }}>
+          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '6px 8px 6px 8px', borderRadius: '3px', }}>
             <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
             </a>
@@ -366,13 +363,13 @@ function App() {
               ref={fgRef} // Attach the ForceGraph2D reference
               graphData={graphData}
               nodeCanvasObject={paintNode}
-              linkCurvature={0.0}
+              linkCurvature={0.25}
               nodeAutoColorBy="depth"
               d3Force={(forceSimulation) => {
-                forceSimulation.force('link', forceLink().id((d) => d.id).distance(-200));
+                forceSimulation.force('link', forceLink().id((d) => d.id).distance(1000));
 
                 // No collision force to prevent nodes moving around due to tooltips
-                forceSimulation.force('charge', forceManyBody().strength(300));
+                forceSimulation.force('charge', forceManyBody().strength(500));
 
                 // Centering force to keep nodes within the view
                 forceSimulation.force('center', forceCenter(window.innerWidth / 2, window.innerHeight / 2));
@@ -431,6 +428,7 @@ function App() {
             )}
           </>
         )}
+        
         <button
           onClick={scrollToBottom}
           style={{
