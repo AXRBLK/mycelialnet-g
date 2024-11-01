@@ -38,8 +38,8 @@ function App() {
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
-    <strong style={{fontSize:'2.5em'}}>🌲</strong>
     </p>
+    <p>:)</p>
   </div>
 );
 
