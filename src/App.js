@@ -10,12 +10,39 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [clickedNode, setClickedNode] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false); // New state for tooltip visibility
   const [viewMode, setViewMode] = useState('Industry');
   
   const fgRef = useRef();
 
   const colorScheme = ['#ffffff', '#cfff66', '#66CFFF', 'transparent', 'transparent'];
   const circleRadius = 10;
+  const infoTooltipText = (
+  
+  <div>  
+    <p>What is this? </p>
+    <p>🧠 A globally-fueled network of Fungi related organizations. Use for research, discovery, & job searches.</p>
+    <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple sectors of the industry.</p>
+    <p>⚠️ Under Construction!</p>
+    <p><strong>UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
+    <p>
+    <strong style={{fontSize:'2em'}}>🌲</strong>
+    <strong style={{fontSize:'1.5em'}}>🌲</strong>
+    <strong style={{fontSize:'.5em'}}>🍄</strong>
+    <strong style={{fontSize:'2.5em'}}>🌲</strong>
+    <strong style={{fontSize:'.3em'}}>🍄</strong>
+    <strong style={{fontSize:'.5em'}}>🍄</strong>
+    <strong style={{fontSize:'.3em'}}>🍄</strong>
+    <strong style={{fontSize:'1em'}}>🌲</strong>
+    <strong style={{fontSize:'2em'}}>🌲</strong>
+    <strong style={{fontSize:'.3em'}}>🍄</strong>
+    <strong style={{fontSize:'.5em'}}>🍄</strong>
+    <strong style={{fontSize:'.3em'}}>🍄</strong>
+    <strong style={{fontSize:'2.5em'}}>🌲</strong>
+    </p>
+  </div>
+);
+
  
 
   const level0Text = "🌍";
@@ -333,23 +360,59 @@ const paintNode = (node, ctx, globalScale) => {
           </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
-        
+          <button
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            style={{
+              fontSize: '10px',
+              margin: '0 15px',
+              backgroundColor: '#95343F',
+              color: 'white',
+              padding: '8px 12px',
+              borderRadius: '3px',
+              border: 'none',
+              cursor: 'help',
+              position: 'relative'
+            }}
+          >
+            ?
+            {isHovering && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-45px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#505050',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  whiteSpace: 'normal',
+                  width: '200px',
+                  textAlign: 'center',
+                  zIndex: 1000,
+                }}
+              >
+                {infoTooltipText}
+              </div>
+            )}
+          </button>
+
+
           <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px' }}>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLScKplrwxm-Xt7gZF2irypVUa0StEApnWMvnvhgZFOEWAICbKA/viewform" target="_blank" rel="noopener noreferrer" style={{ color: 'white', textDecoration: 'none' }}>
               + Add Company
             </a>
           </i>
-          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: 'navy', padding: '6px 8px 6px 8px', borderRadius: '3px', }}>
+          <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: '#11446C', padding: '6px 8px 6px 8px', borderRadius: '3px', }}>
             <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
             </a>
           </p>
         </div>
 
-          <p style={{ fontSize: '12px', margin: '0 0 10px 0', textAlign:"center" }}>
-            <b>⚠️ Under Construction!</b> <br /> 
-            If things look wild, drag any node into open space and maybe it will correct itself.. maybe!  <br /> Get in touch otherwise. :)
-          </p>
+          
 
           {/*<a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
             3D
