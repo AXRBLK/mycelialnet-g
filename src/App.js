@@ -334,7 +334,7 @@ const paintNode = (node, ctx, globalScale) => {
         onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
       >
         <h1 style={{marginBottom:'5px'}}>MycelialNet🌐</h1>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px 14px 8px 14px' }}>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px 2% 8px 2%' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '22px' }}>
             <input
