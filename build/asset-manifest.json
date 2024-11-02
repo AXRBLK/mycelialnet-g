@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/mycelialnet-g/static/css/main.f855e6bc.css",
-    "main.js": "/mycelialnet-g/static/js/main.ff44030a.js",
+    "main.js": "/mycelialnet-g/static/js/main.a8a87d3a.js",
     "static/js/453.74927aeb.chunk.js": "/mycelialnet-g/static/js/453.74927aeb.chunk.js",
     "index.html": "/mycelialnet-g/index.html",
     "main.f855e6bc.css.map": "/mycelialnet-g/static/css/main.f855e6bc.css.map",
-    "main.ff44030a.js.map": "/mycelialnet-g/static/js/main.ff44030a.js.map",
+    "main.a8a87d3a.js.map": "/mycelialnet-g/static/js/main.a8a87d3a.js.map",
     "453.74927aeb.chunk.js.map": "/mycelialnet-g/static/js/453.74927aeb.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.ff44030a.js"
+    "static/js/main.a8a87d3a.js"
   ]
 }

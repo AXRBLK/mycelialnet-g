@@ -26,11 +26,11 @@ function App() {
     <p>⚠️ Under Construction!</p>
     <p><strong>UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
     <p>
+    <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
     <strong style={{fontSize:'1.5em'}}>🌲</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     <strong style={{fontSize:'2.5em'}}>🌲</strong>
-    <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'1em'}}>🌲</strong>
