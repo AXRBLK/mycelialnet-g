@@ -21,9 +21,10 @@ function App() {
 
   // Configurable highlight styling
   const highlightStyle = {
-    color: '#cfff66',
-    thickness: 8,
-    fontSizeMultiplier: 4,
+    color: 'rgba(102,  255, 150,.9',
+    zIndex:1000,
+    thickness: 15,
+    fontSizeMultiplier: 2,
   };
 
   const infoTooltipText = (
@@ -265,7 +266,7 @@ function App() {
       maxWidth = 15;
     } else if (node.depth === 2) {
       fontSize *= 1;
-      maxWidth = 18;
+      maxWidth = 15;
     } else if (node.depth === 1) {
       fontSize *= 1;
       maxWidth = 5;
@@ -280,9 +281,10 @@ function App() {
       ctx.fillStyle = highlightStyle.color;
       ctx.fillRect(
         node.x - maxWidth / 2 - 5,
-        node.y + fontSize / 2 - 5,
+        node.y + fontSize / 2 - 10,
         maxWidth + 10,
         highlightStyle.thickness
+
       );
     }
 
@@ -416,7 +418,7 @@ function App() {
               nodeCanvasObject={paintNode}
               onNodeClick={handleNodeClick}
               onNodeHover={handleNodeHover}
-              linkCurvature={0.25}
+              linkCurvature={0.3}
               nodeAutoColorBy="depth"
               d3Force={(forceSimulation) => {
                 forceSimulation.force('link', forceLink().id((d) => d.id).distance(1000));
