@@ -308,12 +308,13 @@ function App() {
         value={searchQuery}
         onChange={handleSearchChange}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           bottom: '30px',
           left: '42%',
           padding: '5px',
           border: '1px solid #ccc',
           zIndex: 1000,
+          width:'15%',
           backgroundColor:'#cfff66'
         }}
       />
