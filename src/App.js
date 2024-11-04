@@ -33,6 +33,7 @@ function App() {
     <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple sectors of the industry.</p>
     <p>⚠️ Under Construction!</p>
     <p><strong>UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
+    <p><strong>Search:</strong> View this application on desktop to be able to search specific for categories or companies!</p>
     <p>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
