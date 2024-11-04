@@ -319,7 +319,7 @@ function App() {
           zIndex: 1000,
           width: '15%',
           backgroundColor: '#cfff66',
-          display: window.innerWidth <= 600 ? 'none' : 'block' // Hide on mobile
+          display: window.innerWidth <= 999 ? 'none' : 'block' // Hide on mobile
         }}
       />
 
