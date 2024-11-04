@@ -10,15 +10,22 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [clickedNode, setClickedNode] = useState(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false); // New state for tooltip visibility
+  const [isHovering, setIsHovering] = useState(false);
   const [viewMode, setViewMode] = useState('Industry');
+  const [searchQuery, setSearchQuery] = useState('');
   
   const fgRef = useRef();
-
   const colorScheme = ['#ffffff', '#cfff66', '#66CFFF', 'transparent', 'transparent'];
   const circleRadius = 10;
+
+  // Configurable highlight styling
+  const highlightStyle = {
+    color: '#cfff66',
+    thickness: 3,
+    fontSizeMultiplier: 2.5,
+  };
+
   const infoTooltipText = (
-  
   <div>  
     <p>What is this? </p>
     <p>🧠 A globally-fueled network of Fungi related organizations. Use for research, discovery, & job searches.</p>
@@ -40,14 +47,12 @@ function App() {
     </p>
     <p>:)</p>
   </div>
-);
+  );
 
  
 
   const level0Text = "🌍";
   const linkText = "🌐 Website";
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,21 +67,20 @@ function App() {
 
         let nodeData = [];
         let linkData = [];
-
+        
         if (viewMode === 'Industry') {
           const parentMap = {};
           rows.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
+            if (index === 0) return;
             const [node, parent, description, url, , , linkedinUrl, tooltip, , , , displayName] = row;
             const nodeName = displayName || node;
 
-            // Only add linkedinUrl if it's not blank
             nodeData.push({
               id: nodeName,
               description: description || '',
               tooltip: tooltip || '',
               url: url || '',
-              linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null // Populate only if not blank
+              linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null
             });
 
             if (parent) {
@@ -105,17 +109,17 @@ function App() {
           const categoryNodes = {};
 
           rows.forEach((row, index) => {
-            if (index === 0) return; // Skip header row
+            if (index === 0) return;
             const [node, category, description, url, country, , linkedinUrl, tooltip, , , , displayName] = row;
 
             const countryCategoryKey = `${country}-${category}`;
-            const countryDisplayName = row[12] || country; // Use column L (index 11) for country name
+            const countryDisplayName = row[12] || country;
 
             if (country) {
               if (!countryNodes[countryDisplayName]) {
                 countryNodes[countryDisplayName] = { id: countryDisplayName, depth: 1, color: colorScheme[1] };
                 nodeData.push(countryNodes[countryDisplayName]);
-                linkData.push({ source: level0Text, target: countryDisplayName });
+                linkData.push({ source: "🌍", target: countryDisplayName });
               }
 
               if (!categoryNodes[countryCategoryKey]) {
@@ -135,7 +139,7 @@ function App() {
                 description: description || '',
                 tooltip: tooltip || '',
                 url: url || '',
-                linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null, // Add LinkedIn URL only if not blank
+                linkedinUrl: linkedinUrl?.trim() ? linkedinUrl : null,
                 color: colorScheme[3],
                 depth: 3
               });
@@ -143,11 +147,10 @@ function App() {
             }
           });
 
-          nodeData.unshift({ id: level0Text, depth: 0, color: colorScheme[0] });
+          nodeData.unshift({ id: "🌍", depth: 0, color: colorScheme[0] });
         }
 
         applyGridLayout(nodeData);
-
         setNodes(nodeData);
         setLinks(linkData);
       } catch (error) {
@@ -158,7 +161,7 @@ function App() {
     };
 
     fetchData();
-  }, [viewMode, level0Text]);
+  }, [viewMode]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -166,7 +169,6 @@ function App() {
   const scrollToBottom = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   };
-
 
   const applyGridLayout = (nodeData) => {
     const parentNodes = {};
@@ -181,7 +183,7 @@ function App() {
       const spacing = 1 * depth;
 
       nodes.forEach((node, i) => {
-        const xPos = (i % gridSize) * spacing - (gridSize / 2) * spacing+5;
+        const xPos = (i % gridSize) * spacing - (gridSize / 2) * spacing + 5;
         const yPos = Math.floor(i / gridSize) * spacing - (gridSize / 2) * spacing;
         node.x = xPos;
         node.y = yPos;
@@ -189,9 +191,48 @@ function App() {
     });
   };
 
-  const graphData = { nodes, links };
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
 
-const wrapText = (ctx, text, maxWidth) => {
+  const handleNodeClick = (node, event) => {
+    const mouseX = event.clientX || event.touches?.[0]?.clientX || 0;
+    const mouseY = event.clientY || event.touches?.[0]?.clientY || 0;
+
+    if (node.tooltip && node.tooltip.trim() !== '') {
+      setClickedNode(node);
+      setTooltipPos({ x: mouseX - 10, y: mouseY - 10 });
+      if (fgRef.current) {
+        fgRef.current.pauseAnimation();
+      }
+    } else {
+      setClickedNode(null);
+      if (fgRef.current) {
+        fgRef.current.resumeAnimation();
+      }
+    }
+    event.stopPropagation();
+  };
+
+  const handleNodeHover = (node) => {
+    const graphContainer = document.querySelector("canvas");
+    graphContainer.style.cursor = node ? "pointer" : "default";
+
+    if (node && node.tooltip && node.tooltip.trim() !== "") {
+      graphContainer.style.cursor = "zoom-in"; // Show magnifying glass if tooltip exists
+    } else {
+      graphContainer.style.cursor = "default";
+    }
+  };
+
+  const handleBackgroundClick = () => {
+    setClickedNode(null);
+    if (fgRef.current) {
+      fgRef.current.resumeAnimation();
+    }
+  };
+
+  const wrapText = (ctx, text, maxWidth) => {
     const words = text.split(' ');
     let line = '';
     const lines = [];
@@ -209,129 +250,78 @@ const wrapText = (ctx, text, maxWidth) => {
     });
     lines.push(line.trim());
     return lines;
-};
+  };
 
-const paintNode = (node, ctx, globalScale) => {
-    const baseFontSize = Math.max(2.5, 3 / globalScale);
-    let fontSize = baseFontSize;
+  const paintNode = (node, ctx, globalScale) => {
+    // Font size and maxWidth based on node level (depth)
+    let fontSize = Math.max(2.5, 3 / globalScale);
     let maxWidth = 10;
-    
-    // Set node-specific text and background properties based on depth
+
     if (node.depth === 3) {
-        fontSize *= 1;
-        maxWidth = 3;
+      fontSize *= 1;
+      maxWidth = 3;
     } else if (node.depth === 2) {
-        fontSize *= 1;
-        maxWidth = 18;
+      fontSize *= 1;
+      maxWidth = 18;
     } else if (node.depth === 1) {
-        fontSize *= 1;
-        maxWidth = 5;
+      fontSize *= 1;
+      maxWidth = 5;
     } else if (node.depth === 0) {
-        fontSize *= 20;
-        maxWidth = 80;
+      fontSize *= 20;
+      maxWidth = 80;
     }
-    
+
+    const isMatching = searchQuery && node.id.toLowerCase().includes(searchQuery);
+    if (isMatching) {
+      fontSize *= highlightStyle.fontSizeMultiplier;
+      ctx.fillStyle = highlightStyle.color;
+      ctx.fillRect(
+        node.x - maxWidth / 2 - 5,
+        node.y + fontSize / 2 - 5,
+        maxWidth + 10,
+        highlightStyle.thickness
+      );
+    }
+
+    ctx.fillStyle = node.color || 'orange';
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
+    ctx.fill();
+
     ctx.font = `${fontSize}px Arial`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'black';
 
-    // Draw background for Level 2+ nodes to help with readability
-    if (node.depth >= 2) {
-        const textLines = wrapText(ctx, node.id, maxWidth);
-        const textHeight = textLines.length * fontSize;
-
-        ctx.fillStyle = node.color || 'orange';
-        ctx.fillRect(
-            node.x - maxWidth / 2 - 5,
-            node.y - textHeight / 2 - 5,
-            maxWidth + 10,
-            textHeight + 10
-        );
-
-        ctx.fillStyle = 'black';
-        textLines.forEach((line, index) => {
-            const lineX = node.x;
-            const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize; // Center each line vertically
-            ctx.fillText(line, lineX, lineY);
-        });
-    } else {
-        // For levels <= 1, draw a circle and place text in the center
-        ctx.fillStyle = node.color || 'orange';
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, circleRadius, 0, 2 * Math.PI, false);
-        ctx.fill();
-
-        ctx.fillStyle = 'black';
-        const textLines = wrapText(ctx, node.id.toUpperCase(), maxWidth);
-        const textHeight = textLines.length * fontSize;
-
-        textLines.forEach((line, index) => {
-            const lineX = node.x;
-            const lineY = node.y - textHeight / 2 + (index + 0.5) * fontSize; // Center each line vertically
-            ctx.fillText(line, lineX, lineY);
-        });
-    }
-};
-
-  const handleNodeClick = (node, event) => {
-    const mouseX = event.clientX || event.touches?.[0]?.clientX || 0;
-    const mouseY = event.clientY || event.touches?.[0]?.clientY || 0;
-
-    // Prevent tooltip for level 2 nodes in 'Country' view mode
-    if (viewMode === 'Country' && node.depth === 2) {
-      setClickedNode(null);
-      return;
-    }
-
-    // Only show tooltip if the node has a non-empty tooltip
-    if (node.tooltip && node.tooltip.trim() !== '') {
-      setClickedNode(node);
-      setTooltipPos({ x: mouseX -10, y: mouseY -10 });
-
-      // Pause the simulation when a tooltip is shown
-      if (fgRef.current) {
-        fgRef.current.pauseAnimation();
-      }
-    } else {
-      setClickedNode(null);
-
-      // Resume the simulation when the tooltip is closed
-      if (fgRef.current) {
-        fgRef.current.resumeAnimation();
-      }
-    }
-    event.stopPropagation();
-  };
-
-  const handleNodeHover = (node) => {
-    const graphContainer = document.querySelector("canvas");
-
-    // Disable hover effect for level 2 nodes in 'Country' view mode
-    if (viewMode === 'Country' && node?.depth === 2) {
-      graphContainer.style.cursor = "default";
-      return;
-    }
-
-    if (node && node.tooltip && node.tooltip.trim() !== "") {
-      graphContainer.style.cursor = "zoom-in"; // Show magnifying glass if tooltip exists
-    } else {
-      graphContainer.style.cursor = "default";
-    }
+    const textLines = wrapText(ctx, node.id, maxWidth);
+    const textHeight = textLines.length * fontSize;
+    textLines.forEach((line, index) => {
+      ctx.fillText(line, node.x, node.y - textHeight / 2 + (index + 0.5) * fontSize);
+    });
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        style={{
+          position: 'absolute',
+          bottom: '100px',
+          left: '30px',
+          padding: '5px',
+          borderRadius: '10px',
+          border: '1px solid #ccc',
+          zIndex: 1000,
+          backgroundColor:'#cfff66'
+        }}
+      />
+
       <div
         style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-        onClick={() => {
-          setClickedNode(null);
-
-          // Resume the simulation when the tooltip is closed
-          if (fgRef.current) {
-            fgRef.current.resumeAnimation();
-          }
-        }}
-        onTouchStart={(e) => e.stopPropagation()} // Handle touch events for mobile devices
+        onClick={handleBackgroundClick}
       >
         <h1 style={{marginBottom:'5px'}}>MycelialNet🌐</h1>
         <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px 2% 8px 2%' }}>
@@ -411,33 +401,23 @@ const paintNode = (node, ctx, globalScale) => {
           </p>
         </div>
 
-          
-
-          {/*<a href="https://axrblk.github.io/mycelialnet-g/3D" style={{ color: 'lightgrey', textDecoration: 'none' }}>
-            3D
-          </a> */}
-
         {loading ? (
           <p>Loading data...</p>
         ) : (
           <>
             <ForceGraph2D
-              ref={fgRef} // Attach the ForceGraph2D reference
-              graphData={graphData}
+              ref={fgRef}
+              graphData={{ nodes, links }}
               nodeCanvasObject={paintNode}
+              onNodeClick={handleNodeClick}
+              onNodeHover={handleNodeHover}
               linkCurvature={0.25}
               nodeAutoColorBy="depth"
               d3Force={(forceSimulation) => {
                 forceSimulation.force('link', forceLink().id((d) => d.id).distance(1000));
-
-                // No collision force to prevent nodes moving around due to tooltips
                 forceSimulation.force('charge', forceManyBody().strength(500));
-
-                // Centering force to keep nodes within the view
                 forceSimulation.force('center', forceCenter(window.innerWidth / 2, window.innerHeight / 2));
               }}
-              onNodeClick={handleNodeClick}
-              onNodeHover={handleNodeHover} // Set hover effect
             />
             {clickedNode && (
               <div
@@ -535,6 +515,7 @@ const paintNode = (node, ctx, globalScale) => {
             <img src={`${process.env.PUBLIC_URL}/blunkworks.png`} alt="Blunkworks" style={{ width: '65px' }} />
           </a> 
         </div>  
+          
       </div>
     </div>
   );
