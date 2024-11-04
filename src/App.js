@@ -329,9 +329,9 @@ function App() {
       >
         <h1 style={{marginBottom:'-10px',marginTop:'-5px',letterSpacing:'-3px',fontSize:'2.5em',}}>MYCELIATED NET<strong style={{fontSize:'.5em',letterSpacing:'-9px'}}>🍄‍🟫🌐🌏</strong></h1>
         <hr style={{border:'1.5px solid #66CFFF',width:'100%'}}/>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center',marginTop:'-8px', marginBottom: '12px', backgroundColor:'#cfff66', color:'black',padding:'8px 2% 8px 2%' }}>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center',marginTop:'-8px', marginBottom: '12px', backgroundColor:'#cfff66', color:'black',padding:'2px 2% 5px 2%' }}>
           Select View ↠
-          <label style={{ marginLeft: '15px',marginRight: '22px' }}>
+          <label style={{ marginLeft: '15px',marginRight: '15px' }}>
             <input
               type="radio"
               name="viewMode"
@@ -339,10 +339,10 @@ function App() {
               checked={viewMode === 'Industry'}
               onChange={() => setViewMode('Industry')}
             />
-            INDUSTRY 🍄‍🟫
+            INDUSTRY
           </label>
             |
-          <label style={{ marginLeft: '15px' }}>
+          <label style={{ marginLeft: '10px' }}>
             <input
               type="radio"
               name="viewMode"
@@ -350,7 +350,7 @@ function App() {
               checked={viewMode === 'Country'}
               onChange={() => setViewMode('Country')}
             />
-            COUNTRY 🌍
+            COUNTRY
           </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
