@@ -13,10 +13,12 @@ function App() {
   const [isHovering, setIsHovering] = useState(false);
   const [viewMode, setViewMode] = useState('Industry');
   const [searchQuery, setSearchQuery] = useState('');
+
   
   const fgRef = useRef();
   const colorScheme = ['#ffffff', '#cfff66', '#66CFFF', 'transparent', 'transparent'];
   const circleRadius = 10;
+  const initialZoomRef = useRef(null); // Track initial zoom level
 
   // Configurable highlight styling
   const highlightStyle = {
@@ -160,7 +162,22 @@ function App() {
       }
     };
 
-    fetchData();
+    fetchData(); // Track initial zoom level for mobile devices
+    if (fgRef.current) {
+      initialZoomRef.current = fgRef.current.zoom();
+    }
+
+    // Handle zoom reset when keyboard opens
+    const handleResize = () => {
+      if (fgRef.current && initialZoomRef.current !== null) {
+        fgRef.current.zoom(initialZoomRef.current);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  
   }, [viewMode]);
 
   const scrollToTop = () => {
