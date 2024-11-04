@@ -18,7 +18,6 @@ function App() {
   const fgRef = useRef();
   const colorScheme = ['#ffffff', '#cfff66', '#66CFFF', 'transparent', 'transparent'];
   const circleRadius = 10;
-  const initialZoomRef = useRef(null); // Track initial zoom level
 
   // Configurable highlight styling
   const highlightStyle = {
@@ -162,21 +161,7 @@ function App() {
       }
     };
 
-    fetchData(); // Track initial zoom level for mobile devices
-    if (fgRef.current) {
-      initialZoomRef.current = fgRef.current.zoom();
-    }
-
-    // Handle zoom reset when keyboard opens
-    const handleResize = () => {
-      if (fgRef.current && initialZoomRef.current !== null) {
-        fgRef.current.zoom(initialZoomRef.current);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
+    fetchData(); 
   
   }, [viewMode]);
 
@@ -331,8 +316,9 @@ function App() {
           padding: '5px',
           border: '1px solid #ccc',
           zIndex: 1000,
-          width:'15%',
-          backgroundColor:'#cfff66'
+          width: '15%',
+          backgroundColor: '#cfff66',
+          display: window.innerWidth <= 600 ? 'none' : 'block' // Hide on mobile
         }}
       />
 
