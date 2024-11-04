@@ -327,8 +327,9 @@ function App() {
         style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         onClick={handleBackgroundClick}
       >
-        <h1 style={{marginBottom:'5px',letterSpacing:'7px',fontSize:'1em',}}>MYCELIATED NET🌐</h1>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px 2% 8px 2%' }}>
+        <h1 style={{marginBottom:'-10px',marginTop:'-5px',letterSpacing:'-3px',fontSize:'2.5em',}}>MYCELIATED NET🌐</h1>
+        <hr style={{border:'1.5px solid #66CFFF',width:'100%'}}/>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center',marginTop:'-8px', marginBottom: '12px', backgroundColor:'#cfff66', color:'black',padding:'8px 2% 8px 2%' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '22px' }}>
             <input
