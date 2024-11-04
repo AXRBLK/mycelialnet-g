@@ -33,7 +33,7 @@ function App() {
     <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple sectors of the industry.</p>
     <p>⚠️ Under Construction!</p>
     <p><strong>UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
-    <p><strong>Search:</strong> View this application on desktop to be able to search specific for categories or companies!</p>
+    <p><strong>Search:</strong> View this application on a computer to be able to search specific for categories or companies!</p>
     <p>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
@@ -327,7 +327,7 @@ function App() {
         style={{ flex: '1', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
         onClick={handleBackgroundClick}
       >
-        <h1 style={{marginBottom:'5px'}}>MycelialNet🌐</h1>
+        <h1 style={{marginBottom:'5px',letterSpacing:'7px',fontSize:'1em',}}>MYCELIATED NET🌐</h1>
         <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center', marginBottom: '12px', backgroundColor:'#cfff66', borderRadius: '3px', color:'black',padding:'8px 2% 8px 2%' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '22px' }}>
