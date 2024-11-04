@@ -21,8 +21,8 @@ function App() {
   // Configurable highlight styling
   const highlightStyle = {
     color: '#cfff66',
-    thickness: 3,
-    fontSizeMultiplier: 2.5,
+    thickness: 8,
+    fontSizeMultiplier: 4,
   };
 
   const infoTooltipText = (
@@ -259,7 +259,7 @@ function App() {
 
     if (node.depth === 3) {
       fontSize *= 1;
-      maxWidth = 3;
+      maxWidth = 15;
     } else if (node.depth === 2) {
       fontSize *= 1;
       maxWidth = 18;
@@ -309,10 +309,9 @@ function App() {
         onChange={handleSearchChange}
         style={{
           position: 'absolute',
-          bottom: '100px',
-          left: '30px',
+          bottom: '30px',
+          left: '42%',
           padding: '5px',
-          borderRadius: '10px',
           border: '1px solid #ccc',
           zIndex: 1000,
           backgroundColor:'#cfff66'
