@@ -28,27 +28,28 @@ function App() {
   };
 
   const infoTooltipText = (
-  <div>  
+  <div style={{textAlign:'left'}}>  
     <p>What is this? </p>
     <p>🧠 A globally-fueled network of Fungi related organizations. Use for research, discovery, & job searches.</p>
-    <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple sectors of the industry.</p>
     <p>⚠️ Under Construction!</p>
-    <p><strong>UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
-    <p><strong>Search:</strong> View this application on a computer to be able to search specific for categories or companies!</p>
+    <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple industries.</p>
+    <p><strong>🤏 UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
+    <p><strong>🔍 Search:</strong> View this application on a computer to be able to search specific for categories or companies!</p>
     <p>
+    <strong style={{fontSize:'1em'}}>🌱</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
     <strong style={{fontSize:'1.5em'}}>🌲</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
-    <strong style={{fontSize:'2.5em'}}>🌲</strong>
+    <strong style={{fontSize:'3em'}}>🌲</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
-    <strong style={{fontSize:'1em'}}>🌲</strong>
+    <strong style={{fontSize:'2em'}}>🌳</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     </p>
-    <p>:)</p>
+    <p style={{fontSize:'2em'}}>:) 🏕️</p>
   </div>
   );
 
