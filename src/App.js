@@ -24,7 +24,7 @@ function App() {
     color: 'rgba(102,  255, 150,.9',
     zIndex:1000,
     thickness: 15,
-    fontSizeMultiplier: 2,
+    fontSizeMultiplier: 4,
   };
 
   const infoTooltipText = (
