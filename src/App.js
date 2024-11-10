@@ -13,6 +13,7 @@ function App() {
   const [isHovering, setIsHovering] = useState(false);
   const [viewMode, setViewMode] = useState('Industry');
   const [searchQuery, setSearchQuery] = useState('');
+  const [rowCount, setRowCount] = useState(0); 
 
   
   const fgRef = useRef();
@@ -21,9 +22,9 @@ function App() {
 
   // Configurable highlight styling
   const highlightStyle = {
-    color: 'rgba(102,  255, 150,.9',
+    color: 'rgba(207,  255, 102,.7',
     zIndex:1000,
-    thickness: 15,
+    thickness: 12,
     fontSizeMultiplier: 4,
   };
 
@@ -61,7 +62,7 @@ function App() {
     const fetchData = async () => {
       const sheetId = '1Ci4Hay8-cHgqq9L8LZV6WIH5rgn8BVJa6018xEmdKTo';
       const apiKey = 'AIzaSyCvCL5fqdrjGj_WjMt_fVDpPLWYSSLRjs8';
-      const range = 'Main!A1:N500';
+      const range = 'Main!A1:R500';
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
 
       try {
@@ -70,6 +71,7 @@ function App() {
 
         let nodeData = [];
         let linkData = [];
+
         
         if (viewMode === 'Industry') {
           const parentMap = {};
@@ -162,6 +164,9 @@ function App() {
         setLoading(false);
       }
     };
+
+
+
 
     fetchData(); 
   
