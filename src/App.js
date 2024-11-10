@@ -364,7 +364,7 @@ function App() {
             </a>
           </i>
           <p style={{ fontSize: '10px', margin: '0 0 0 0', backgroundColor: '#11446C', padding: '6px 8px 6px 8px', borderRadius: '3px', }}>
-            <a href="mailto:alex.r.blunk@gmail.com?subject=MycelialNet%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
+            <a href="mailto:alex.r.blunk@gmail.com?subject=Myceliated.Net%20Inquiry" style={{ color: 'white', textDecoration: 'none' }}>
             ✉️ Contact
             </a>
           </p>
