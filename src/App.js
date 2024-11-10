@@ -29,7 +29,6 @@ function App() {
 
   const infoTooltipText = (
   <div style={{textAlign:'left'}}>  
-    <p>What is this? </p>
     <p>🧠 A globally-fueled network of Fungi related organizations. Use for research, discovery, & job searches.</p>
     <p>⚠️ Under Construction!</p>
     <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple industries.</p>
@@ -49,7 +48,7 @@ function App() {
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'.5em'}}>🍄</strong>
     </p>
-    <p style={{fontSize:'2em'}}>:) 🏕️</p>
+    
   </div>
   );
 
@@ -357,44 +356,6 @@ function App() {
           </label>
         </div>
         <div style={{ display: 'flex', alignItems: 'center',marginBottom:'10px'}}>
-          <button
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            style={{
-              fontSize: '10px',
-              margin: '0 15px',
-              backgroundColor: '#95343F',
-              color: 'white',
-              padding: '8px 12px',
-              borderRadius: '3px',
-              border: 'none',
-              cursor: 'help',
-              position: 'relative'
-            }}
-          >
-            ?
-            {isHovering && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-45px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  backgroundColor: '#505050',
-                  color: 'white',
-                  padding: '10px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  whiteSpace: 'normal',
-                  width: '200px',
-                  textAlign: 'center',
-                  zIndex: 1000,
-                }}
-              >
-                {infoTooltipText}
-              </div>
-            )}
-          </button>
 
 
           <i style={{ fontSize: '10px', margin: '0 15px 0 0', backgroundColor: 'green', padding: '8px', borderRadius: '3px' }}>
@@ -479,6 +440,50 @@ function App() {
           </>
         )}
         
+
+          <button
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            style={{
+              fontSize: '10px',
+              margin: '0 15px',
+              backgroundColor: '#66CFFF',
+              color: 'black',
+              padding: '8px 12px',
+              borderRadius: '3px',
+              border: 'none',
+              cursor: 'help',
+              position: 'absolute',
+              bottom: '60px',
+              left: '15px',
+            }}
+          >
+            What is this?
+            {isHovering && (
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '50%',
+                  left: '150%',
+                  transform: 'translateX(-50%)',
+                  backgroundColor: '#505050',
+                  color: 'white',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  whiteSpace: 'normal',
+                  width: '200px',
+                  textAlign: 'center',
+                  zIndex: 1000,
+                }}
+              >
+                {infoTooltipText}
+              </div>
+            )}
+          </button>
+
+
+
         <button
           onClick={scrollToBottom}
           style={{
