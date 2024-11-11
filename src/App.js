@@ -22,19 +22,22 @@ function App() {
 
   // Configurable highlight styling
   const highlightStyle = {
-    color: 'rgba(207,  255, 102,.7',
+    color: 'rgba(102,  255, 150,.9',
     zIndex:1000,
-    thickness: 12,
+    thickness: 15,
     fontSizeMultiplier: 4,
   };
 
   const infoTooltipText = (
   <div style={{textAlign:'left'}}>  
-    <p>🧠 A globally-fueled network of Fungi related organizations. Use for research, discovery, & job searches.</p>
-    <p>⚠️ Under Construction!</p>
-    <p>Very open to ideas or feedback! Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple industries.</p>
-    <p><strong>🤏 UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
-    <p><strong>🔍 Search:</strong> View this application on a computer to be able to search specific for categories or companies!</p>
+    <p>🧠 A global hub of fungi-related organizations. Use for research, discovery, & job searches.</p>
+
+    <p><strong style={{fontSize:'1.25em'}}>🌐 {rowCount}</strong> orgs. mapped to-date.</p>
+
+<p><strong style={{fontSize:'1.25em'}}>🔍 Search:</strong> View this application on a desktop to be able to search for specific categories or organization names!</p>
+    <p><strong style={{fontSize:'1.25em'}} >🗃️ Grouping:</strong> Assignment of the industry category is largely determined off of a quick scan of the primary focus of the organization -- but as with most things with mushrooms, there are quite a lot of companies adding innovations to multiple industries. Very open to ideas or feedback!</p>
+    <p><strong style={{fontSize:'1.25em'}} >🤏 UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
+    
     <p>
     <strong style={{fontSize:'1em'}}>🌱</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
@@ -71,6 +74,18 @@ function App() {
 
         let nodeData = [];
         let linkData = [];
+
+
+
+        // Count rows with text in column A and 'FALSE' in column R
+      const validRowsCount = rows.filter((row, index) => 
+        index !== 0 && row[0] && row[17] === 'FALSE'
+      ).length;
+
+      console.log(`Count of rows with text in column A and Column R = FALSE: ${validRowsCount}`);
+      
+      // Store the count in the component state
+      setRowCount(validRowsCount);
 
         
         if (viewMode === 'Industry') {
@@ -164,9 +179,6 @@ function App() {
         setLoading(false);
       }
     };
-
-
-
 
     fetchData(); 
   
@@ -336,7 +348,7 @@ function App() {
       >
         <h1 style={{marginBottom:'-10px',marginTop:'-5px',letterSpacing:'-3px',fontSize:'2.5em',}}>MYCELIATED NET<strong style={{fontSize:'.5em',letterSpacing:'-9px'}}>🍄‍🟫🌐🌏</strong></h1>
         <hr style={{border:'1.5px solid #66CFFF',width:'100%'}}/>
-        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center',marginTop:'-8px', marginBottom: '12px', backgroundColor:'#cfff66', color:'black',padding:'2px 2% 5px 2%' }}>
+        <div style={{ fontSize:'14px',alignItems: 'center', textAlign: 'center',marginTop:'-8px', marginBottom: '12px', backgroundColor:'#cfff66', color:'black',padding:'5px 2% 5px 2%' }}>
           Select View ↠
           <label style={{ marginLeft: '15px',marginRight: '15px' }}>
             <input
