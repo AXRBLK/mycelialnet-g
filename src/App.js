@@ -39,7 +39,6 @@ function App() {
     <p><strong style={{fontSize:'1.25em'}} >🤏 UX:</strong> If things look wild, drag any node into open space and maybe it will correct itself... maybe!</p>
     
     <p>
-    <strong style={{fontSize:'1em'}}>🌱</strong>
     <strong style={{fontSize:'.3em'}}>🍄</strong>
     <strong style={{fontSize:'2em'}}>🌲</strong>
     <strong style={{fontSize:'1.5em'}}>🌲</strong>
