@@ -30,7 +30,7 @@ function App() {
 
   const infoTooltipText = (
   <div style={{textAlign:'left'}}>  
-    <p>🧠 A global hub of fungi-related organizations. Use for research, discovery, & job searches.</p>
+    <p><strong style={{fontSize:'2em'}}>🌍</strong> A global hub of fungi-related organizations. For research, discovery, & job search use.</p>
 
     <p><strong style={{fontSize:'1.25em'}}>🌐 {rowCount}</strong> orgs. mapped to-date.</p>
 
@@ -462,12 +462,12 @@ function App() {
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             style={{
-              fontSize: '10px',
+              fontSize: '20px',
               margin: '0 15px',
-              backgroundColor: '#66CFFF',
+              backgroundColor: '#cfff66',
               color: 'black',
               padding: '8px 12px',
-              borderRadius: '3px',
+              borderRadius: '2px',
               border: 'none',
               cursor: 'help',
               position: 'absolute',
@@ -475,13 +475,13 @@ function App() {
               left: '15px',
             }}
           >
-            What is this?
+            🎙️
             {isHovering && (
               <div
                 style={{
                   position: 'absolute',
                   bottom: '50%',
-                  left: '150%',
+                  left: '200%',
                   transform: 'translateX(-50%)',
                   backgroundColor: '#505050',
                   color: 'white',
